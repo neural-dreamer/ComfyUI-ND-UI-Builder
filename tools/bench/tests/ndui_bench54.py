@@ -1,0 +1,83 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+# Copyright (c) 2026 Ivan Ovchinnikov (Neural Dreamer)
+# Bench 54: the Templates tab of the editor: ready-made pages, my templates (page / whole panel) with miniatures, userdata files.
+import json, urllib.request, urllib.parse
+from lib import *
+p, br, pg, errs = start()
+J = lambda s, a=None: pg.evaluate(s, a) if a is not None else pg.evaluate(s)
+setup(pg)
+J("""async () => { const m = await import('/scripts/app.js'); const a = m.app; const LG = window.LiteGraph; a.graph.clear();
+  const u = LG.createNode('NDUI'); u.pos=[480,60]; u.size=[900,500]; a.graph.add(u);
+  const W=(id,type,page,x,y,w,h,props)=>({id,type,page,x,y,w,h,z:1,slots:{},props:props||{}});
+  const ui={sources:[],pages:[{id:'p1',name:'Main'},{id:'p2',name:'Second'}],widgets:[W('a','generate','p1',20,20,300,64),W('b','queue','p1',20,100,240,48),W('c','progress','p2',20,20,360,48),W('d','generate','p2',20,90,200,64),W('e','queue','p2',240,90,200,64)],view:{}};
+  u.properties.nd_ui = ui; window.ndUi.host().save(ui); }""")
+pg.wait_for_timeout(600)
+J("window.ndUi.host().openEditor()"); pg.wait_for_timeout(1200)
+tabs = J("()=>[...document.querySelectorAll('.nde-right .nde-rtabs button')].map(b=>[b.dataset.rtab, b.classList.contains('on')])")
+check("the right panel has Settings, Templates and Editor tabs", tabs == [["settings", True], ["templates", False], ["editor", False]], str(tabs))
+check("the old Presets section is gone from the settings", not J("()=>document.body.textContent.includes('Presets and templates')"))
+J("()=>document.querySelector('[data-rtab=templates]').click()"); pg.wait_for_timeout(500)
+built = J("()=>[...document.querySelectorAll('.nde-tpl[data-id]')].map(t=>[t.dataset.id, t.querySelectorAll('.ndt-w').length])")
+check("four ready-made pages with miniatures that show widgets", len(built) == 4 and all(b[1] >= 3 for b in built), str(built))
+check("nothing of my own yet", J("()=>document.body.textContent.includes('Nothing yet')"))
+J("()=>document.querySelector('.nde-tpl[data-id=columns] .nde-tpl-act button').click()"); pg.wait_for_timeout(500)
+n = J("()=>window.ndUi.host().editor.ui.pages.length")
+check("a ready-made page is added from the tab", n == 3, str(n))
+# save the current page (the new one) as a template
+J("()=>document.querySelector('.nde-right .nde-tools .nde-btn.primary').click()"); pg.wait_for_timeout(400)
+dlg = J("()=>{const c=document.querySelector('.nde-confirm'); return c? [...c.querySelectorAll('button')].map(b=>b.textContent) : null}")
+check("the save dialog opens with the scope choice", dlg and "This page only" in dlg and "The whole panel with all its pages" in dlg and "Save" in dlg, str(dlg))
+check("Save is off while the name is empty", J("()=>[...document.querySelectorAll('.nde-confirm .nde-btn')].find(b=>b.textContent==='Save').disabled"))
+J("""()=>{const i=document.querySelector('.nde-confirm input'); i.value='My columns'; i.dispatchEvent(new Event('input',{bubbles:true}))}""")
+check("the preview shows the page", J("()=>document.querySelectorAll('.nde-confirm .ndt-w').length") >= 5)
+J("()=>[...document.querySelectorAll('.nde-confirm .nde-btn')].find(b=>b.textContent==='Save').click()"); pg.wait_for_timeout(900)
+files = json.loads(urllib.request.urlopen(URL + "/userdata?dir=ndui-templates&full_info=true").read())
+check("a file appeared in the templates folder", len(files) == 1 and files[0]["path"].endswith(".json"), str(files))
+body = json.loads(urllib.request.urlopen(URL + "/userdata/" + urllib.parse.quote("ndui-templates/" + files[0]["path"], safe="")).read())
+check("it keeps name, kind, the page and a one-page panel", body["format"] == "neuraldreamer-ndui-template" and body["name"] == "My columns" and body["kind"] == "page" and len(body["ui"]["pages"]) == 1 and len(body["ui"]["widgets"]) >= 5, str(body)[:300])
+mine = J("()=>[...document.querySelectorAll('.nde-tpl[data-slug]')].map(t=>[t.dataset.slug, t.dataset.kind, t.querySelectorAll('.ndt-w').length])")
+check("my template is in the gallery with a miniature", len(mine) == 1 and mine[0][1] == "page" and mine[0][2] >= 5, str(mine))
+# the whole panel, with the picture from the second page
+J("()=>document.querySelector('.nde-right .nde-tools .nde-btn.primary').click()"); pg.wait_for_timeout(400)
+J("""()=>{const i=document.querySelector('.nde-confirm input'); i.value='Everything'; i.dispatchEvent(new Event('input',{bubbles:true}))}""")
+J("()=>[...document.querySelectorAll('.nde-confirm .nde-seg button')].find(b=>b.textContent==='The whole panel with all its pages').click()"); pg.wait_for_timeout(200)
+J("""()=>{const s=document.querySelector('.nde-confirm select'); s.value='p2'; s.dispatchEvent(new Event('change',{bubbles:true}))}"""); pg.wait_for_timeout(200)
+check("the preview follows the chosen tab (3 widgets of the second page)", J("()=>document.querySelectorAll('.nde-confirm .ndt-w').length") == 3)
+J("()=>[...document.querySelectorAll('.nde-confirm .nde-btn')].find(b=>b.textContent==='Save').click()"); pg.wait_for_timeout(900)
+mine = J("()=>[...document.querySelectorAll('.nde-tpl[data-slug]')].map(t=>[t.dataset.slug, t.dataset.kind, t.querySelectorAll('.ndt-w').length])")
+check("two templates; the panel one shows the widgets of the chosen tab", len(mine) == 2 and any(m[1] == "panel" and m[2] == 3 for m in mine), str(mine))
+# apply the page template
+J("()=>document.querySelector('.nde-tpl[data-kind=page] .nde-tpl-act button').click()"); pg.wait_for_timeout(600)
+st = J("()=>{const u=window.ndUi.host().editor.ui; return [u.pages.length, u.widgets.length]}")
+check("a page template adds a page with fresh widgets", st[0] == 4, str(st))
+ids = J("()=>{const w=window.ndUi.host().editor.ui.widgets.map(w=>w.id); return w.length===new Set(w).size}")
+check("ids stay unique", ids)
+# rename, then the whole-panel template replaces the panel after a confirmation
+J("()=>document.querySelector('.nde-tpl[data-kind=page] .nde-tpl-act button:last-child').click()"); pg.wait_for_timeout(300)
+J("()=>[...document.querySelectorAll('.nde-tmenu .nde-btn')].find(b=>b.textContent==='Rename').click()"); pg.wait_for_timeout(300)
+J("""()=>{const i=document.querySelector('.nde-confirm input'); i.value='Renamed'; i.dispatchEvent(new Event('input',{bubbles:true}))}""")
+J("()=>[...document.querySelectorAll('.nde-confirm .nde-btn')].find(b=>b.textContent==='Save').click()"); pg.wait_for_timeout(800)
+names = J("()=>[...document.querySelectorAll('.nde-tpl[data-slug] .nde-tpl-name')].map(n=>n.textContent)")
+check("rename works", "Renamed" in names and "My columns" not in names, str(names))
+J("()=>document.querySelector('.nde-tpl[data-kind=panel] .nde-tpl-act button').click()"); pg.wait_for_timeout(400)
+check("a panel template asks before it replaces", J("()=>!!document.querySelector('.nde-confirm') && document.querySelector('.nde-confirm').textContent.includes('Replace')"))
+J("()=>[...document.querySelectorAll('.nde-confirm .nde-btn')].find(b=>b.textContent==='Replace').click()"); pg.wait_for_timeout(700)
+st = J("()=>{const u=window.ndUi.host().editor.ui; return [u.pages.length, u.widgets.length]}")
+check("the panel is replaced (the 3 pages and 7 widgets of the saved one)", st[0] == 3 and st[1] >= 8, str(st))
+# delete
+J("()=>document.querySelector('[data-rtab=templates]').click()"); pg.wait_for_timeout(300)
+J("()=>document.querySelector('.nde-tpl[data-kind=page] .nde-tpl-act button:last-child').click()"); pg.wait_for_timeout(300)
+J("()=>[...document.querySelectorAll('.nde-tmenu .nde-btn')].find(b=>b.textContent==='Delete').click()"); pg.wait_for_timeout(300)
+J("()=>[...document.querySelectorAll('.nde-confirm .nde-btn')].find(b=>b.textContent==='Delete').click()"); pg.wait_for_timeout(800)
+files = json.loads(urllib.request.urlopen(URL + "/userdata?dir=ndui-templates&full_info=true").read())
+check("delete removes the file and the tile", len(files) == 1 and J("()=>document.querySelectorAll('.nde-tpl[data-slug]').length") == 1, str(files))
+# the tab is remembered; the list is read again after a restart of the editor
+J("()=>window.ndUi.host().editor.close()"); pg.wait_for_timeout(500)
+J("()=>{const d=document.querySelector('.nde-confirm .nde-btn.danger, .nde-confirm .nde-btn.primary'); d?.click()}"); pg.wait_for_timeout(300)
+J("window.ndUi.host().openEditor()"); pg.wait_for_timeout(1400)
+check("the Templates tab is remembered and lists my template again", J("()=>document.querySelector('.nde-rtabs button.on')?.dataset.rtab") == "templates" and J("()=>document.querySelectorAll('.nde-tpl[data-slug]').length") == 1)
+# selecting a widget goes back to the settings
+J("()=>window.ndUi.host().editor.select([window.ndUi.host().editor.ui.widgets[0].id])"); pg.wait_for_timeout(400)
+check("selecting a widget shows its settings", J("()=>document.querySelector('.nde-rtabs button.on')?.dataset.rtab") == "settings")
+J("window.ndUi.host().editor?.close?.()")
+finish(p, br, errs)

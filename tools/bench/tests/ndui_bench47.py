@@ -1,0 +1,30 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+# Copyright (c) 2026 Ivan Ovchinnikov (Neural Dreamer)
+# Bench 47: the list of commands in the REAL settings dialog of ComfyUI (a modal: the pointer is off outside it, it closes on a press outside,
+# it takes the focus back). The rows must light up under the mouse, a click must add the command, typing in the search must work.
+from lib import *
+p, br, pg, errs = start()
+J = lambda s, a=None: pg.evaluate(s, a) if a is not None else pg.evaluate(s)
+setup(pg)
+J("""async()=>{const m=await import('/scripts/app.js'); await m.app.extensionManager.setting.set('NeuralDreamerUI.AllowedHotkeys', []); await m.app.extensionManager.command.execute('Comfy.ShowSettingsDialog')}"""); pg.wait_for_timeout(1500)
+pg.fill("input[placeholder*='Search Settings']", "Allowed ComfyUI Hotkeys"); pg.wait_for_timeout(1200)
+check("the field is in the settings", J("!!document.querySelector('.ndui-hk .add')"))
+pg.click(".ndui-hk .add"); pg.wait_for_timeout(500)
+check("the list opens and the settings stay open", J("!!document.querySelector('.ndui-hkp') && !!document.querySelector('.ndui-hk')"))
+pos = lambda sel, i=0: J("(a)=>{const e=document.querySelectorAll(a[0])[a[1]]; const b=e.getBoundingClientRect(); return [b.x+b.width/2,b.y+b.height/2]}", [sel, i])
+b = pos(".ndui-hkp .row", 1)
+hit = J("(a)=>{const t=document.elementFromPoint(a[0],a[1]); return !!(t && t.closest('.ndui-hkp'))}", b)
+check("the mouse reaches the rows (the modal does not switch the pointer off for them)", hit is True)
+pg.mouse.move(b[0], b[1]); pg.wait_for_timeout(250)
+check("the row under the mouse lights up", J("getComputedStyle(document.querySelectorAll('.ndui-hkp .row')[1]).backgroundColor") != "rgba(0, 0, 0, 0)")
+# the search: typing goes into the field and narrows the list
+pg.click(".ndui-hkp input"); pg.keyboard.type("refresh"); pg.wait_for_timeout(300)
+check("typing in the search works (the dialog does not take the focus back)", J("document.querySelector('.ndui-hkp input').value") == "refresh" and J("document.querySelectorAll('.ndui-hkp .row').length") < 6)
+check("the list is still open after typing", J("!!document.querySelector('.ndui-hkp')"))
+b = pos(".ndui-hkp .row", 0)
+pg.mouse.click(b[0], b[1]); pg.wait_for_timeout(500)
+chips = J("[...document.querySelectorAll('.ndui-hk .chip')].map(c=>c.textContent)")
+check("a click adds the command to the field", len(chips) == 1 and "Refresh" in chips[0], str(chips))
+check("the list closes and the settings dialog stays open", J("!document.querySelector('.ndui-hkp') && !!document.querySelector('.ndui-hk')"))
+check("the setting holds the command id", J("async()=>{const m=await import('/scripts/app.js'); return m.app.extensionManager.setting.get('NeuralDreamerUI.AllowedHotkeys')}") == ["Comfy.RefreshNodeDefinitions"])
+finish(p, br, errs)

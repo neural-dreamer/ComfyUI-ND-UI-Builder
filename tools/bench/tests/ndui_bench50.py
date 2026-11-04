@@ -1,0 +1,86 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+# Copyright (c) 2026 Ivan Ovchinnikov (Neural Dreamer)
+# Bench 50: the editor — the group "Top bar" of the library, picking a ComfyUI button on the top bar (wheel: button -> block, Esc, no repeats), drop on the ghost.
+from lib import *
+p, br, pg, errs = start()
+J = lambda s, a=None: pg.evaluate(s, a) if a is not None else pg.evaluate(s)
+setup(pg)
+J("""async () => { const m = await import('/scripts/app.js'); const a = m.app; const LG = window.LiteGraph; a.graph.clear();
+  const u = LG.createNode('NDUI'); u.pos=[480,60]; u.size=[900,500]; a.graph.add(u);
+  const ui={sources:[],pages:[{id:'p1',name:'Main'}],widgets:[],view:{}};
+  u.properties.nd_ui = ui; window.ndUi.host().save(ui);
+  const { ComfyButtonGroup } = await import('/scripts/ui/components/buttonGroup.js'); const { ComfyButton } = await import('/scripts/ui/components/button.js');
+  a.menu.settingsGroup.element.before(new ComfyButtonGroup(new ComfyButton({ icon: 'star', tooltip: 'Test Alpha', action: () => {} }), new ComfyButton({ content: 'Beta', tooltip: 'Test Beta', action: () => {} })).element); }""")
+pg.wait_for_timeout(600)
+J("window.ndUi.host().openEditor()"); pg.wait_for_timeout(1200)
+E = lambda code: J("()=>{const E=window.ndUi.host().editor; return " + code + "}")
+items = lambda: E("JSON.parse(JSON.stringify(E.ui.view.toolbar.items))")
+# the library
+pg.locator(".nde-tabs button", has_text="Widgets").click(timeout=3000); pg.wait_for_timeout(300)
+check("the library has the group Top bar with 4 tiles", J("(()=>{const g=[...document.querySelectorAll('.nde-pgrp')].find(x=>x.textContent==='Top bar'); return !!g && g.nextElementSibling.querySelectorAll('.nde-lib-i').length===4})()"))
+tile = lambda name: pg.locator(".nde-lib-i", has_text=name).first
+tile("Separator").click(); pg.wait_for_timeout(300)
+check("a click on Separator adds it to the end of the toolbar", [i["kind"] for i in items()] == ["sep"])
+check("the new item is selected and the inspector shows its settings (width, line)", E("E.tbSel") == items()[0]["id"] and J("document.body.textContent.includes('Line colour')"))
+tile("Unload models and cache").click(); pg.wait_for_timeout(300)
+tile("Unload models").first.click(); pg.wait_for_timeout(300)
+check("the memory tiles add the memory buttons", [i["kind"] for i in items()] == ["sep", "unloadCache", "unload"], str([i["kind"] for i in items()]))
+check("the ghost shows the three items", J("document.querySelectorAll('.nde-ghost .ndk-um-tools .ndk-tb-item').length") == 3)
+# drop from the library onto the ghost (HTML5 drag and drop)
+src = pg.locator(".nde-lib-i", has_text="Separator").first
+src.dispatch_event("dragstart", {"dataTransfer": pg.evaluate_handle("new DataTransfer()")})
+pg.wait_for_timeout(300)
+check("while a Top bar tile is dragged the ghost is a drop target", J("!!document.querySelector('.nde-ghost .ndk-um-tools.editable')"))
+dt = pg.evaluate_handle("(()=>{const d=new DataTransfer(); d.setData('application/x-nd-tbitem','sep'); return d})()")
+pl = pg.locator(".nde-ghost .ndk-um-tools")
+pl.dispatch_event("drop", {"dataTransfer": dt, "clientX": 5, "clientY": 20}); pg.wait_for_timeout(300)
+check("a tile dropped on the ghost is placed in the toolbar (at the position of the drop)", len(items()) == 4 and items()[0]["kind"] == "sep", str([i["kind"] for i in items()]))
+pg.locator(".nde-lib-i", has_text="Separator").first.dispatch_event("dragend")
+# empty toolbar: the drop target appears while dragging
+E("(E.change(null,(u)=>{u.view.toolbar.items=[]}), E.tbSel=null, E.renderOverlay(), 1)")
+check("empty toolbar: nothing in the ghost", J("document.querySelectorAll('.nde-ghost .ndk-um-tools').length") == 0)
+pg.locator(".nde-lib-i", has_text="Separator").first.dispatch_event("dragstart", {"dataTransfer": pg.evaluate_handle("new DataTransfer()")}); pg.wait_for_timeout(300)
+check("empty toolbar: a placeholder shows while dragging", J("!!document.querySelector('.nde-ghost .ndk-tb-item.ph')"))
+pg.locator(".nde-lib-i", has_text="Separator").first.dispatch_event("dragend"); pg.wait_for_timeout(200)
+# picking
+tile("ComfyUI button or block").click(); pg.wait_for_timeout(500)
+check("the pick mode hides the editor and shows the hint", J("getComputedStyle(document.querySelector('.nde-root, .nde')||document.body).display")!="x" and J("!!document.querySelector('.nde-hint')") and E("E.root.style.display")=="none")
+pos = J("(()=>{const b=document.querySelector('[title=\"Test Beta\"]').getBoundingClientRect(); const g=document.querySelector('[title=\"Test Beta\"]').closest('.comfyui-button-group').getBoundingClientRect(); return [b.left+b.width/2,b.top+b.height/2,g.width,b.width]})()")
+pg.mouse.move(pos[0], pos[1]); pg.wait_for_timeout(250)
+lab = J("document.querySelector('.nde-hl-lab')?.textContent")
+check("hovering a button shows its name and that it moves", lab and "Test Beta" in lab and "moves" in lab, str(lab))
+hl = J("(()=>{const h=document.querySelector('.nde-hl'); return h?h.getBoundingClientRect().width:0})()")
+check("the frame is the size of the button", abs(hl - pos[3]) < 6, f"{hl} {pos[3]}")
+pg.mouse.wheel(0, -100); pg.wait_for_timeout(250)
+hl2 = J("(()=>{const h=document.querySelector('.nde-hl'); return h?h.getBoundingClientRect().width:0})()")
+check("the wheel up widens the frame to the whole group", hl2 > hl + 10 and abs(hl2 - pos[2]) < 8, f"{hl} {hl2} {pos[2]}")
+pg.mouse.wheel(0, 100); pg.wait_for_timeout(250)
+hl3 = J("(()=>{const h=document.querySelector('.nde-hl'); return h?h.getBoundingClientRect().width:0})()")
+check("the wheel down goes back to the button", abs(hl3 - hl) < 3)
+pg.keyboard.press("Escape"); pg.wait_for_timeout(300)
+check("Esc cancels the pick and brings the editor back", E("E.root.style.display") == "" and not J("!!document.querySelector('.nde-hint')") and len(items()) == 0)
+# pick the group
+tile("ComfyUI button or block").click(); pg.wait_for_timeout(400)
+pg.mouse.move(pos[0], pos[1]); pg.wait_for_timeout(200); pg.mouse.wheel(0, -100); pg.wait_for_timeout(200)
+pg.mouse.click(pos[0], pos[1]); pg.wait_for_timeout(500)
+it = items()
+check("a click adds the item with a fingerprint, in the move mode, and brings the editor back", len(it) == 1 and it[0]["kind"] == "comfy" and it[0]["how"] == "move" and it[0]["fp"]["zone"] == "legacy" and E("E.root.style.display") == "", str(it))
+check("the item is selected; the inspector has its name and the way it is shown", E("E.tbSel") == it[0]["id"] and J("document.body.textContent.includes('moved here')"))
+check("the ghost draws a plain square for the ComfyUI element (not a copy of it)", J("(()=>{const q=document.querySelector('.nde-ghost .ndk-tb-item.comfy.sq'); return !!q && !q.querySelector('button') && q.getBoundingClientRect().height<=36})()"))
+check("the original button was not pressed or moved by the pick", J("!!document.querySelector('[title=\"Test Beta\"]') && !document.querySelector('[title=\"Test Beta\"]').closest('.ndk-tb-item')"))
+# the same one cannot be added twice
+tile("ComfyUI button or block").click(); pg.wait_for_timeout(400)
+pg.mouse.move(pos[0], pos[1]); pg.wait_for_timeout(200); pg.mouse.wheel(0, -100); pg.wait_for_timeout(200)
+lab = J("document.querySelector('.nde-hl-lab')?.textContent")
+check("an element that is already on the toolbar is marked", lab and "already added" in lab, str(lab))
+pg.mouse.click(pos[0], pos[1]); pg.wait_for_timeout(300)
+check("and is not added again", len(items()) == 1 and E("E.root.style.display") == "none")
+pg.keyboard.press("Escape"); pg.wait_for_timeout(300)
+# a Vue element is a copy
+tile("ComfyUI button or block").click(); pg.wait_for_timeout(400)
+v = J("(()=>{const b=[...document.querySelectorAll('[data-testid=action-bar-card] button')].find(e=>/Run options|Toggle properties/.test(e.title+e.getAttribute('aria-label'))); const r=b.getBoundingClientRect(); return [r.left+r.width/2,r.top+r.height/2]})()")
+pg.mouse.move(v[0] - 3, v[1]); pg.mouse.move(v[0], v[1]); pg.wait_for_timeout(300)
+lab = J("document.querySelector('.nde-hl-lab')?.textContent")
+check("a button that ComfyUI draws itself is marked as a copy", lab and "copy" in lab, str(lab))
+pg.keyboard.press("Escape"); pg.wait_for_timeout(300)
+finish(p, br, errs)

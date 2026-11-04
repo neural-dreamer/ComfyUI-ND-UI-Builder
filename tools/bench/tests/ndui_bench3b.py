@@ -1,0 +1,20 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+# Copyright (c) 2026 Ivan Ovchinnikov (Neural Dreamer)
+# ND UI bench 3b: the middle button pans the canvas in "Pick on canvas"; the discard dialog keeps its buttons inside.
+from lib import *
+p, br, pg, errs = start()
+setup(pg)
+pg.evaluate("async()=>{const m=await import('/scripts/app.js'); m.app.graph._nodes.find(n=>n.type==='NDUI').ndUiApi.openEdit();}"); pg.wait_for_timeout(600)
+pg.click(".nde-tabs button:has-text('Widgets')"); pg.click(".nde-lib-i:has-text('Number')")
+pg.click(".nde-top .nde-btn:has-text('Cancel')"); pg.wait_for_timeout(200)
+box = pg.evaluate("(()=>{const d=document.querySelector('.nde-confirm>div').getBoundingClientRect(); return [...document.querySelectorAll('.nde-confirm .acts .nde-btn')].every(b=>{const r=b.getBoundingClientRect(); return r.left>=d.left&&r.right<=d.right})})()")
+check("the buttons of the discard dialog stay inside it", box is True)
+pg.click(".nde-confirm .nde-btn:has-text('Keep editing')")
+pg.click(".nde-tabs button:has-text('Link')"); pg.click("text=Pick on canvas"); pg.wait_for_timeout(300)
+o0 = pg.evaluate("async()=>{const m=await import('/scripts/app.js'); return [...m.app.canvas.ds.offset]}")
+pg.mouse.move(900, 700); pg.mouse.down(button="middle"); pg.mouse.move(800, 640, steps=5); pg.mouse.up(button="middle"); pg.wait_for_timeout(200)
+o1 = pg.evaluate("async()=>{const m=await import('/scripts/app.js'); return [...m.app.canvas.ds.offset]}")
+check("the middle button pans the canvas while picking", abs(o1[0]-o0[0]) > 40, f"{o0}->{o1}")
+pg.keyboard.press("Escape"); pg.wait_for_timeout(200)
+check("Esc brings the editor back", pg.query_selector(".nde") is not None and pg.evaluate("getComputedStyle(document.querySelector('.nde')).display") != "none")
+finish(p, br, errs)

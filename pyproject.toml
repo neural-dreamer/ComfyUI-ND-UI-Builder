@@ -1,0 +1,22 @@
+[project]
+name = "comfyui-neuraldreamer-ui-builder"
+description = "ComfyUI ND UI Builder — build your own stylish control panel for ComfyUI: bind widgets to parameters of any nodes, lay them out freely, run the whole workflow from a clean full-window interface."
+version = "1.0.0"
+license = "AGPL-3.0-only"
+license-files = ["LICENSE", "LICENSES/*.txt", "js/fonts/Inter-LICENSE.txt"]
+authors = [{ name = "Ivan Ovchinnikov (Neural Dreamer)", email = "ivan.kvento@gmail.com" }]
+classifiers = [
+    "Operating System :: OS Independent",
+]
+dependencies = []
+requires-python = ">=3.9"
+
+[project.urls]
+Repository = "https://github.com/neural-dreamer/ComfyUI-NeuralDreamer-UI-Builder"
+Documentation = "https://github.com/neural-dreamer/ComfyUI-NeuralDreamer-UI-Builder#readme"
+"Bug Tracker" = "https://github.com/neural-dreamer/ComfyUI-NeuralDreamer-UI-Builder/issues"
+
+[tool.comfy]
+PublisherId = "neural-dreamer"
+DisplayName = "ComfyUI ND UI Builder"
+Icon = "https://raw.githubusercontent.com/neural-dreamer/ComfyUI-NeuralDreamer-UI-Builder/main/icon.png"

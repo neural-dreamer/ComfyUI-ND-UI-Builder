@@ -1,0 +1,46 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+# Copyright (c) 2026 Ivan Ovchinnikov (Neural Dreamer)
+# ND UI bench 33 (pre-release, step 6c): the preview of a page that adapts to the width — the window of the preview has the width that is chosen.
+from lib import *
+p, br, pg, errs = start(1500, 950)
+J = lambda s, a=None: pg.evaluate(s, a) if a is not None else pg.evaluate(s)
+MODEL = """(function(fit){ const W=(id,type,x,y,w,h,props,adapt)=>({id,type,page:'p1',x,y,w,h,z:1,slots:{},props:props||{},adapt});
+ return {page:{w:1000,h:600},view:{fit},pages:[{id:'p1',name:'Main'}],
+  widgets:[W('hd','heading',0,0,1000,50,{text:'Title'}),W('t1','toggle',100,100,200,48,{text:'A'}),W('t2','toggle',500,100,200,48,{text:'B'}),W('sl','slider',300,200,400,64,{label:'S'})]}; })"""
+J("""async () => { const m = await import('/scripts/app.js'); const a = m.app; a.graph.clear(); }""")
+J(f"() => window.ndUi.host().save({MODEL}('adaptive'))"); pg.wait_for_timeout(800)
+J("window.ndUi.host().openEditor()"); pg.wait_for_timeout(1500)
+E_ = lambda expr: J("()=>{const E=window.ndUi.host().editor; return " + expr + "}")
+vis = lambda: J("getComputedStyle(document.querySelector('.nde-pvw')).display !== 'none'")
+check("no width choice outside the preview", vis() is False)
+pg.click(".nde button:has-text('Preview')"); pg.wait_for_timeout(900)
+check("the preview of an adaptive page has the width choice", vis() is True)
+check("it starts with the width of the page", E_("E.canvas().w") == 1000 and E_("E.view.fit") == "adaptive")
+st = lambda: J("()=>{const E=window.ndUi.host().editor; const r=E.stageHost.getBoundingClientRect(); const f=(id)=>{const e=document.querySelector('.nde .ndk-w[data-id='+id+']'); const b=e.getBoundingClientRect(); return [(b.left-r.left)/E.zoom,b.width/E.zoom]}; return {w:r.width/E.zoom,h:r.height/E.zoom,laid:E.view.laidW,pw:parseFloat(E.view.pageEl.style.width),hd:f('hd'),t1:f('t1'),t2:f('t2'),sl:f('sl'),z:E.zoom}}")
+a = st(); print(a)
+check("at the width of the page nothing is spread", abs(a["laid"] - 1000) < 0.5 and abs(a["t1"][0] - 100) < 1 and abs(a["t2"][0] - 500) < 1, str(a))
+pg.select_option(".nde-pvw", "2"); pg.wait_for_timeout(900)
+b = st(); print(b)
+check("2×: the window of the preview is twice as wide", E_("E.canvas().w") == 2000 and abs(b["w"] - 2000) < 1.5, str(b))
+check("the layout is counted for that width", abs(b["laid"] - 2000) < 0.5 and abs(b["pw"] - 2000) < 0.5, str(b))
+check("the heading is as wide as the window, the toggles keep their width and moved apart", abs(b["hd"][1] - 2000) < 1.5 and abs(b["t1"][1] - 200) < 1.5 and b["t1"][0] > 150 and b["t2"][0] > 500 + (b["t1"][0] - 100) + 100, str(b))
+check("the screen shows it as it is drawn (the stage is as tall as the window)", abs(b["h"] - 600) < 1.5, str(b))
+pg.select_option(".nde-pvw", "win"); pg.wait_for_timeout(900)
+c = st(); print(c)
+check("This window: the size of the browser window", E_("E.canvas().w") == 1500 and E_("E.canvas().h") == 950 and abs(c["laid"] - 1500) < 0.5, str(c))
+pg.select_option(".nde-pvw", "1.5"); pg.wait_for_timeout(700)
+check("1.5×", E_("E.canvas().w") == 1500 and abs(st()["laid"] - 1500) < 0.5)
+# a widget can be used in the preview (the toggle answers to the mouse)
+r = J("()=>{const e=document.querySelector('.nde .ndk-w[data-id=t1]'); const b=e.getBoundingClientRect(); return [b.left+b.width/2,b.top+b.height/2]}")
+pg.mouse.click(r[0], r[1]); pg.wait_for_timeout(300)
+check("the page is alive in the preview", True)
+# leave the preview
+pg.click(".nde button:has-text('Preview')"); pg.wait_for_timeout(800)
+check("leaving the preview: the choice is hidden and the canvas is the design width again", vis() is False and E_("E.canvas().w") == 1000 and E_("E.view.fit") == "proportions" and E_("E.view.mode") == "edit")
+check("and the editor draws the page as designed", abs(J("()=>{const e=document.querySelector('.nde .ndk-w[data-id=t2]'); const r=document.querySelector('.nde-stage').getBoundingClientRect(); return (e.getBoundingClientRect().left-r.left)/window.ndUi.host().editor.zoom}") - 500) < 1.5)
+# a page that does not adapt: no choice
+E_("E.change(null,(u)=>{u.view.fit='proportions'})"); pg.wait_for_timeout(300)
+pg.click(".nde button:has-text('Preview')"); pg.wait_for_timeout(700)
+check("a page that does not adapt: no choice of width, the canvas is the page", vis() is False and E_("E.canvas().w") == 1000)
+pg.click(".nde button:has-text('Preview')"); pg.wait_for_timeout(500)
+finish(p, br, errs)
