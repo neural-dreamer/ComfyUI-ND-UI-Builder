@@ -18,7 +18,7 @@
 
 <p align="center"><a href="https://youtu.be/c8wx4VMnxcE"><img src="docs/images/promo_video.webp" alt="ComfyUI ND UI Builder: промо-ролик" width="720"></a></p>
 
-<p align="center"><b><a href="https://youtu.be/c8wx4VMnxcE">Смотреть промо</a></b> (около минуты: что это и что умеет)</p>
+<p align="center"><b><a href="https://youtu.be/c8wx4VMnxcE">Смотреть промо</a></b> (около 30 секунд: что это и что умеет)</p>
 
 Пошаговые уроки собраны в одном плейлисте: [ComfyUI ND UI Builder на YouTube](https://www.youtube.com/playlist?list=PLGnUD4GeMWjo)
 
