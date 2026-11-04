@@ -18,7 +18,7 @@
 
 <p align="center"><a href="https://youtu.be/c8wx4VMnxcE"><img src="docs/images/promo_video.webp" alt="ComfyUI ND UI Builder 宣传片" width="720"></a></p>
 
-<p align="center"><b><a href="https://youtu.be/c8wx4VMnxcE">观看宣传片</a></b>（约一分钟：它是什么、能做什么）</p>
+<p align="center"><b><a href="https://youtu.be/c8wx4VMnxcE">观看宣传片</a></b>（大约30秒：它是什么、能做什么）</p>
 
 分步教程都在同一个播放列表中：[YouTube 上的 ComfyUI ND UI Builder](https://www.youtube.com/playlist?list=PLGnUD4GeMWjo)
 
