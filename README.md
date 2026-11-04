@@ -14,6 +14,22 @@ Build your own clean control panel for any ComfyUI workflow. Bind big, friendly 
 
 ![The panel](docs/images/en/02_panel_result.webp)
 
+## Video
+
+<p align="center"><a href="https://youtu.be/c8wx4VMnxcE"><img src="docs/images/promo_video.webp" alt="ComfyUI ND UI Builder: promo video" width="720"></a></p>
+
+<p align="center"><b><a href="https://youtu.be/c8wx4VMnxcE">Watch the promo</a></b> (about a minute: what it is and what it does)</p>
+
+Step-by-step tutorials, one playlist: [ComfyUI ND UI Builder on YouTube](https://www.youtube.com/playlist?list=PLGnUD4GeMWjo)
+
+| # | Tutorial | What you learn |
+|---|---|---|
+| 1 | The basics | Installation, the ND UI and Edit buttons, tagging nodes |
+| 2 | Your first interface | Build a complete text-to-image panel with a live result |
+| 3 | Finishing touches | Tabs, spoilers, groups, themes |
+
+The tutorials have **English, Russian and Chinese** audio tracks, the promo has English and Russian. On YouTube open **Settings (gear) → Audio track** to switch the language.
+
 ## Features
 
 - **Visual editor.** Drag widgets onto pages, resize, group, align, layer. Undo and redo, templates, projects.

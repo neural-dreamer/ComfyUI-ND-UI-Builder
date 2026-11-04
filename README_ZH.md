@@ -14,6 +14,22 @@
 
 ![面板](docs/images/zh/02_panel_result.webp)
 
+## 视频
+
+<p align="center"><a href="https://youtu.be/c8wx4VMnxcE"><img src="docs/images/promo_video.webp" alt="ComfyUI ND UI Builder 宣传片" width="720"></a></p>
+
+<p align="center"><b><a href="https://youtu.be/c8wx4VMnxcE">观看宣传片</a></b>（约一分钟：它是什么、能做什么）</p>
+
+分步教程都在同一个播放列表中：[YouTube 上的 ComfyUI ND UI Builder](https://www.youtube.com/playlist?list=PLGnUD4GeMWjo)
+
+| # | 教程 | 你将学到 |
+|---|---|---|
+| 1 | 基础 | 安装、ND UI 与 Edit 按钮、给节点打标签 |
+| 2 | 你的第一个界面 | 搭建带实时结果的完整文生图面板 |
+| 3 | 收尾润色 | 标签页、折叠面板、分组、主题 |
+
+教程提供**英语、俄语和中文**音轨，宣传片提供英语和俄语音轨。在 YouTube 上打开**设置（齿轮）→ 音轨**即可切换语言。
+
 ## 功能
 
 - **可视化编辑器。** 把控件拖到页面上，调整大小、分组、对齐、管理图层。支持撤销与重做、模板和项目。
