@@ -52,14 +52,25 @@ export function mountProgressBar(root, getUi, tr) {
     const box = el("ndk-pbar");
     root.append(box);
     const bar = makeBar(box);
+    // "Hide when idle": after a finished (or stopped) run the bar stays for a moment, then goes away. An error stays until the next run.
+    const LINGER = 3000;
+    let lastActive = 0, timer = 0;
     const show = () => {
+        clearTimeout(timer);
         const cfg = getUi().view.progressBar;
         if (!cfg?.show) { box.style.display = "none"; return; }
         const d = barData(tr);
-        box.style.display = cfg.idleHide && d.idle ? "none" : "";
+        if (d.active) lastActive = Date.now();
+        let hide = false;
+        if (cfg.idleHide && !d.active && !d.err) {
+            const left = LINGER - (Date.now() - lastActive);
+            if (d.idle || left <= 0) hide = true;
+            else timer = setTimeout(show, left + 20);
+        }
+        box.style.display = hide ? "none" : "";
         bar.paint(cfg, d);
     };
     const unsub = subscribe(show);
     show();
-    return { update: show, destroy() { unsub(); box.remove(); } };
+    return { update: show, destroy() { clearTimeout(timer); unsub(); box.remove(); } };
 }

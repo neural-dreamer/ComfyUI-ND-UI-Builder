@@ -59,6 +59,21 @@ ws({"type": "status", "data": {"status": {"exec_info": {"queue_remaining": 1}}}}
 ws({"type": "execution_start", "data": {"prompt_id": "pX"}}); pg.wait_for_timeout(200)
 ws({"type": "execution_error", "data": {"prompt_id": "pX", "exception_message": "Boom", "node_id": "5"}}); pg.wait_for_timeout(400)
 check("an error turns the bar red", J("()=>document.querySelector('.ndk-uimode .ndk-pbar').classList.contains('err')"))
+# "Hide when idle": a finished run leaves the bar for a moment, then it goes; with the option off it stays; an error stays
+VIS = "()=>getComputedStyle(document.querySelector('.ndk-uimode .ndk-pbar')).display!=='none'"
+def run_ok(i):
+    ws({"type": "status", "data": {"status": {"exec_info": {"queue_remaining": 1}}}})
+    ws({"type": "execution_start", "data": {"prompt_id": "pI%d" % i}}); pg.wait_for_timeout(200)
+    ws({"type": "execution_success", "data": {"prompt_id": "pI%d" % i}})
+J("""()=>{const u=JSON.parse(JSON.stringify(window.ndUi.host().ui)); Object.assign(u.view.progressBar,{idleHide:true,pos:'top',mode:'split'}); window.ndUi.host().save(u)}"""); pg.wait_for_timeout(500)
+run_ok(1); pg.wait_for_timeout(600)
+check("idle hide on: the bar is still there right after the run", J(VIS))
+pg.wait_for_timeout(3500)
+check("idle hide on: the bar is gone a few seconds after the run", not J(VIS))
+J("""()=>{const u=JSON.parse(JSON.stringify(window.ndUi.host().ui)); u.view.progressBar.idleHide=false; window.ndUi.host().save(u)}"""); pg.wait_for_timeout(500)
+check("idle hide off: the finished bar stays", J(VIS))
+J("""()=>{const u=JSON.parse(JSON.stringify(window.ndUi.host().ui)); u.view.progressBar.idleHide=true; window.ndUi.host().save(u)}"""); pg.wait_for_timeout(500)
+check("idle hide on again: the bar goes", not J(VIS))
 # default: off
 d0 = J("""async()=>{const M=await import('/extensions/ComfyUI-NeuralDreamer-UI/ndui/model.js'); return M.normalizeNdUi({}).view.progressBar}""")
 check("off by default", d0["show"] is False and d0["pos"] == "top" and d0["mode"] == "split", str(d0))
