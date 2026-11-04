@@ -18,7 +18,7 @@ Build your own clean control panel for any ComfyUI workflow. Bind big, friendly 
 
 <p align="center"><a href="https://youtu.be/c8wx4VMnxcE"><img src="docs/images/promo_video.webp" alt="ComfyUI ND UI Builder: promo video" width="720"></a></p>
 
-<p align="center"><b><a href="https://youtu.be/c8wx4VMnxcE">Watch the promo</a></b> (about a minute: what it is and what it does)</p>
+<p align="center"><b><a href="https://youtu.be/c8wx4VMnxcE">Watch the promo</a></b> (about 30 seconds: what it is and what it does)</p>
 
 Step-by-step tutorials, one playlist: [ComfyUI ND UI Builder on YouTube](https://www.youtube.com/playlist?list=PLGnUD4GeMWjo)
 
