@@ -5,7 +5,7 @@
 </p>
 
 <p align="center">
-<img src="https://img.shields.io/badge/version-1.0.0-7c5cff" alt="version 1.0.0"> <a href="LICENSE"><img src="https://img.shields.io/badge/license-AGPL--3.0-blue" alt="license AGPL-3.0"></a>
+<img src="https://img.shields.io/badge/version-1.1.0-7c5cff" alt="version 1.1.0"> <a href="LICENSE"><img src="https://img.shields.io/badge/license-AGPL--3.0-blue" alt="license AGPL-3.0"></a>
 </p>
 
 # ComfyUI ND UI Builder
@@ -18,7 +18,7 @@
 
 <p align="center"><a href="https://youtu.be/c8wx4VMnxcE"><img src="docs/images/promo_video.webp" alt="ComfyUI ND UI Builder 宣传片" width="720"></a></p>
 
-<p align="center"><b><a href="https://youtu.be/c8wx4VMnxcE">观看宣传片</a></b>（大约30秒：它是什么、能做什么）</p>
+<p align="center"><b><a href="https://youtu.be/c8wx4VMnxcE">观看宣传片</a></b>（约一分钟：它是什么、能做什么）</p>
 
 分步教程都在同一个播放列表中：[YouTube 上的 ComfyUI ND UI Builder](https://www.youtube.com/playlist?list=PLGnUD4GeMWjo)
 
@@ -53,7 +53,7 @@
 
 重启 ComfyUI 并刷新页面（Ctrl+F5）。**Run** 旁边会出现 **ND UI** 和 **Edit** 两个按钮。没有 Python 依赖。已在 ComfyUI 前端 1.55 和 1.57 上测试。
 
-部分控件（Images Input、视频 / 音频输入、LoRA 堆栈、Show Any As Text、变体预览）使用配套插件 [Neural Dreamer Nodes](https://github.com/neural-dreamer/ComfyUI-NeuralDreamer-Nodes) 的节点，需要 1.3.1 或更高版本。没有它 Builder 也能工作。
+部分控件（Images Input、视频 / 音频输入、LoRA 堆栈、Show Any As Text、变体预览）使用配套插件 [Neural Dreamer Nodes](https://github.com/neural-dreamer/ComfyUI-NeuralDreamer-Nodes) 的节点，需要 1.3.1 或更高版本（H3 Temporal LoRA 堆栈的时间设置需要 1.4.0）。没有它 Builder 也能工作。
 
 ## 快速开始
 

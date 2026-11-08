@@ -10,6 +10,8 @@
 
 **控件提示要安装 Neural Dreamer Nodes。** 见 [Neural Dreamer Nodes](12-neural-dreamer-nodes.md)。变体预览需要 1.3.1 或更高版本。
 
+**我下载了新模型并按了 R，但面板里看不到。** 在 ComfyUI 中再按一次 R：刷新节点定义时，面板的列表、模型选择器和 LoRA 图库会重新读取文件夹。LoRA 堆栈控件需要 Neural Dreamer Nodes 1.4.0 或更新版本。
+
 **模式中 ComfyUI 的快捷键不起作用。** 这是有意为之。请在 ComfyUI 设置 *ComfyUI ND UI Builder → ND UI mode* 中放行相应命令。
 
 **在配置较低的电脑上页面卡顿。** 选择没有模糊的主题（午夜、工作室、ComfyUI），或关闭*使用模糊*。

@@ -38,9 +38,9 @@ check("height written -> the node outputs both", res["r2"] == [768, 1344], str(r
 J("window.ndUi.enter()"); pg.wait_for_timeout(1000)
 val = J("()=>{const i=document.querySelectorAll('.ndk-uimode .ndk-w'); return [...i].map(f=>[f.querySelector('.ndk-label')?.textContent, f.querySelector('input')?.value])}")
 check("the slider and the number show the node's value", any(v[0]=="Num" and v[1]=="13" for v in val), str(val))
-sz = J("()=>[...document.querySelectorAll('.ndk-uimode .ndk-res .ndk-input')].map(i=>i.value)")
+sz = J("()=>[...document.querySelectorAll('.ndk-uimode .ndk-res-size .ndk-input')].map(i=>i.value)")
 check("the Resolution widget shows the node's size", sz == ["768", "1344"], str(sz))
-J("()=>{const i=[...document.querySelectorAll('.ndk-uimode .ndk-res .ndk-input')][0]; i.focus(); i.value='1024'; i.dispatchEvent(new Event('change',{bubbles:true}))}"); pg.wait_for_timeout(500)
+J("()=>{const i=[...document.querySelectorAll('.ndk-uimode .ndk-res-size .ndk-input')][0]; i.focus(); i.value='1024'; i.dispatchEvent(new Event('change',{bubbles:true}))}"); pg.wait_for_timeout(500)
 z = J("async()=>{const g=(await import('/scripts/app.js')).app.graph; return g._nodes.find(n=>n.type==='NDResolution').ndRes.size()}")
 check("typing a width in the widget reaches ND Resolution", z[0] == 1024, str(z))
 # options of the Resolution widget: the chips are optional

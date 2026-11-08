@@ -16,6 +16,7 @@ import { projectMenu, runProject } from "./ndui/project_ui.js";
 import { S_OPEN } from "./ndui/project.js";
 import { S_HOTKEYS, renderSetting } from "./ndui/hotkeys.js";
 import { openSwitcher, installSwitcherKeys, trackPictures } from "./ndui/switcher.js";
+import { refreshModels } from "./ndui/models.js";
 
 const S_ESC = "NeuralDreamerUI.Esc";
 const S_START = "NeuralDreamerUI.StartInUi";
@@ -100,4 +101,7 @@ app.registerExtension({
     },
 
     async afterConfigureGraph() { afterLoad(); },
+
+    // the R key (Refresh Node Definitions): ComfyUI has already put the new lists into the widgets of the nodes; forget what the panel read about the files
+    async refreshComboInNodes() { refreshModels(); },
 });

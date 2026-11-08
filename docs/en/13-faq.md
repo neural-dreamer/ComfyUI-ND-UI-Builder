@@ -10,6 +10,8 @@
 
 **A widget says to install Neural Dreamer Nodes.** See [Neural Dreamer Nodes](12-neural-dreamer-nodes.md). Version 1.3.1 or newer is needed for Variant Preview.
 
+**I downloaded a new model and pressed R, but the panel does not show it.** Press R once more in ComfyUI: the lists, the pickers and the LoRA gallery of the panel read the folders again when the node definitions are refreshed. The LoRA Stack widget needs Neural Dreamer Nodes 1.4.0 or newer for this.
+
 **Hotkeys of ComfyUI do not work in the mode.** That is on purpose. Allow commands in the ComfyUI settings, *ComfyUI ND UI Builder → ND UI mode*.
 
 **The page is blurry or slow on a weak machine.** Choose a theme without blur (Midnight, Studio, ComfyUI), or turn *Use blur* off.

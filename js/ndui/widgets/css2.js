@@ -87,7 +87,13 @@ export const EXTRA_CSS = `
 .ndk-res-size .x{flex:0 0 auto;color:var(--ndk-faint)}
 .ndk-res-size .ndk-iconbtn{width:var(--ndk-ctl);height:var(--ndk-ctl);border:1px solid var(--ndk-field-border);border-radius:var(--ndk-rm);background:var(--ndk-field-bg)}
 .ndk-res-size .ndk-iconbtn.on{background:var(--ndk-accent-soft);color:var(--ndk-accent);border-color:var(--ndk-accent)}
-.ndk-res-opts{display:flex;gap:6px;align-items:center}
+.ndk-res-opts{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.ndk-res-opts .ndk-chip{white-space:nowrap}
+.ndk-res-mp{display:flex;align-items:center;gap:4px;min-width:0}
+.ndk-res-mp .lab{flex:0 0 auto;margin-right:2px;font-size:11px;font-weight:600;color:var(--ndk-faint)}
+.ndk-res-mp .ndk-field{flex:0 1 62px;min-width:44px}
+.ndk-res-mp .ndk-input{text-align:center;padding:0 4px}
+.ndk-res-mp .ndk-iconbtn{flex:0 0 auto;width:calc(var(--ndk-ctl) - 6px);height:calc(var(--ndk-ctl) - 6px);border:1px solid var(--ndk-field-border);border-radius:var(--ndk-rs);background:var(--ndk-field-bg)}
 .ndk-res-opts .ndk-field{flex:1 1 auto}
 .ndk-res-view{flex:0 0 38%;max-width:150px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:var(--ndk-faint);font-size:11.5px;text-align:center}
 .ndk-res-box{display:flex;align-items:center;justify-content:center;width:100%;aspect-ratio:1}

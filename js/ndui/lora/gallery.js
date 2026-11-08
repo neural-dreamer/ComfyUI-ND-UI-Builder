@@ -4,7 +4,7 @@
 // openGallery(ctx, anchor, {folder, names, current, title, onPick}); ctx = {tr, vars(), popupHost()} (the same as the popups of the widgets).
 import { el, icon, popup } from "../widgets/util.js";
 import { infoButtons, fillInfo, hasInfo } from "./info_view.js";
-import { catalog, previewOf, previewUrlOf, isNd, dirName, stemName, favorites, recents, galleryFilter } from "../models.js";
+import { catalog, previewOf, previewUrlOf, isNd, dirName, stemName, favorites, recents, galleryFilter , onModelsChanged } from "../models.js";
 import { videoEl, nsfwButton, shieldButton } from "./media.js";
 
 export function openGallery(ctx, anchor, { folder = "loras", names = null, current = null, title = "", onPick }) {
@@ -116,6 +116,8 @@ export function openGallery(ctx, anchor, { folder = "loras", names = null, curre
             input.addEventListener("keydown", (e) => { e.stopPropagation(); if (e.key === "Enter") grid.querySelector(".ndk-lg-card")?.click(); });
             draw();
             load(false);
+            // R pressed while the gallery is open: the files may have changed
+            const off = onModelsChanged(() => { if (!box.isConnected) off(); else load(true); });
             setTimeout(() => input.focus(), 0);
         },
     });

@@ -5,7 +5,7 @@
 </p>
 
 <p align="center">
-<img src="https://img.shields.io/badge/version-1.0.0-7c5cff" alt="version 1.0.0"> <a href="LICENSE"><img src="https://img.shields.io/badge/license-AGPL--3.0-blue" alt="license AGPL-3.0"></a>
+<img src="https://img.shields.io/badge/version-1.1.0-7c5cff" alt="version 1.1.0"> <a href="LICENSE"><img src="https://img.shields.io/badge/license-AGPL--3.0-blue" alt="license AGPL-3.0"></a>
 </p>
 
 # ComfyUI ND UI Builder
@@ -18,7 +18,7 @@ Build your own clean control panel for any ComfyUI workflow. Bind big, friendly 
 
 <p align="center"><a href="https://youtu.be/c8wx4VMnxcE"><img src="docs/images/promo_video.webp" alt="ComfyUI ND UI Builder: promo video" width="720"></a></p>
 
-<p align="center"><b><a href="https://youtu.be/c8wx4VMnxcE">Watch the promo</a></b> (about 30 seconds: what it is and what it does)</p>
+<p align="center"><b><a href="https://youtu.be/c8wx4VMnxcE">Watch the promo</a></b> (about a minute: what it is and what it does)</p>
 
 Step-by-step tutorials, one playlist: [ComfyUI ND UI Builder on YouTube](https://www.youtube.com/playlist?list=PLGnUD4GeMWjo)
 
@@ -53,7 +53,7 @@ The tutorials have **English, Russian and Chinese** audio tracks, the promo has 
 
 Restart ComfyUI and reload the page (Ctrl+F5). Two buttons, **ND UI** and **Edit**, appear next to **Run**. No Python dependencies. Tried on the ComfyUI frontend 1.55 and 1.57.
 
-Some widgets (Images Input, Video / Audio Input, LoRA Stack, Show Any As Text, Variant Preview) use the nodes of the companion pack [Neural Dreamer Nodes](https://github.com/neural-dreamer/ComfyUI-NeuralDreamer-Nodes), version 1.3.1 or newer. The Builder works without it.
+Some widgets (Images Input, Video / Audio Input, LoRA Stack, Show Any As Text, Variant Preview) use the nodes of the companion pack [Neural Dreamer Nodes](https://github.com/neural-dreamer/ComfyUI-NeuralDreamer-Nodes), version 1.3.1 or newer (1.4.0 for the time settings of the H3 Temporal LoRA stack). The Builder works without it.
 
 ## Quick start
 

@@ -6,7 +6,7 @@
 //   results  the pictures of a node, thumbnails of the earlier runs of the session, Save, and pulling a picture out of the page.
 //   compare  picture A and picture B (wipe or side by side): from the results, the run before, a node, a file name or the thumbnails.
 import { el, icon } from "./util.js";
-import { events, forNode, latestAny, viewUrl, bridgeFor } from "../events.js";
+import { events, forNode, latestAny, viewUrl, bridgeFor, bridgeHasAudio, anyBridgeAudio } from "../events.js";
 import { openLightbox } from "./media.js";
 import { makeDraggable, downloadRef, downloadUrl, refFromName } from "../media/io.js";
 import { registerViewer } from "../live_mark.js";
@@ -99,7 +99,9 @@ export const viewer = {
             labelA: ctx.prop("labelA") ?? "A", labelB: ctx.prop("labelB") ?? "B", mute: ctx.prop("muteComfy") === true,
         });
         const eyeOn = () => ctx.prop("liveOn") !== false;
-        const soundOn = () => ctx.prop("sound") === true;
+        // the speaker and the volume exist only when an audio VAE is wired to the bridge
+        const hasAudio = () => { const ls = ctx.info("live"); if (ls.bound) return !!ls.node && bridgeHasAudio(bridgeFor(ls.node)); return anyBridgeAudio(); };
+        const soundOn = () => ctx.prop("sound") === true && hasAudio();
         const volume = () => Math.max(0, Math.min(100, Number(ctx.prop("volume") ?? 70))) / 100;
         const applySound = () => { for (const v of vids) { v.volume = volume(); v.muted = !soundOn(); } };
         const playing = (v) => { const r = v.play?.(); r?.catch?.(() => { v.muted = true; v.play?.().catch?.(() => {}); }); };   // the browser may refuse sound before a click
@@ -265,11 +267,11 @@ export const viewer = {
             }
             tabs.style.display = tabs.childElementCount ? "" : "none";
 
-            const toolKey = [m, set.map((r) => r.filename).join(","), p.save, p.tools, p.live, eyeOn(), showLiveImg ? 1 : 0, soundOn() ? 1 : 0].join("|");
+            const toolKey = [m, set.map((r) => r.filename).join(","), p.save, p.tools, p.live, eyeOn(), showLiveImg ? 1 : 0, hasAudio() ? 1 : 0, soundOn() ? 1 : 0].join("|");
             if (toolKey !== keys.tools) {
                 keys.tools = toolKey; tools.textContent = "";
-                if (p.live) {
-                    tools.append(pillBtn(soundOn() ? "speaker" : "speakerOff", ctx.tr(soundOn() ? "Turn the sound of the live preview off" : "Turn the sound of the live preview on"), () => { ctx.setProp("sound", !soundOn()); applySound(); keys.tools = ""; render(); }, "snd"));
+                if (p.live && hasAudio()) {
+                    tools.append(pillBtn(soundOn() ? "speaker" : "speakerOff", ctx.tr(soundOn() ? "Turn the sound of the live preview off" : "Turn the sound of the live preview on"), () => { ctx.setProp("sound", !(ctx.prop("sound") === true)); applySound(); keys.tools = ""; render(); }, "snd"));
                     if (soundOn()) {
                         const vol = el("input", "ndk-vw-vol"); vol.type = "range"; vol.min = "0"; vol.max = "100"; vol.step = "1"; vol.value = String(Math.round(volume() * 100)); vol.title = ctx.tr("Volume");
                         vol.addEventListener("input", () => { ctx.setProp("volume", Number(vol.value)); applySound(); });

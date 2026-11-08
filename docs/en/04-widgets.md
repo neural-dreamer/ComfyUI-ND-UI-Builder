@@ -275,6 +275,8 @@ Width and height together: ratio buttons, swap, lock, size presets and the megap
 | Show the size of the model | on | Off: the button is hidden; the chosen size of the model is still used by the ratio buttons. |
 | Show «Multiple of» | on | Off: the button is hidden; the chosen multiple is still used when sizes are rounded. |
 | Keep the ratio | off | Changing one side changes the other. |
+| Set the size in megapixels | off | Adds an **MP** field with ◀ ▶ (step 0.1, Shift 0.5): the ratio buttons then aim at that area, and the size of the model is not used. Typing a number keeps the shape of the picture. |
+| Megapixels | 1 | The area for the mode above (0.01 – 100). The field in the widget changes it too. |
 
 ### Model Picker
 
@@ -290,7 +292,9 @@ A model chooser with folders and search for any COMBO parameter that lists model
 
 ### LoRA Stack
 
-The LoRA stack of Neural Dreamer Nodes with a gallery of previews. Needs the ND LoRA Stack node.
+The LoRA stack of Neural Dreamer Nodes with a gallery of previews. Needs the ND LoRA Stack node or the **ND LoRA Stack H3 Temporal** node.
+
+With the H3 Temporal node (Neural Dreamer Nodes **1.4.0** or newer) every card has a clock button: it opens the time settings of that LoRA (ranges, fades, audio) right in the card, and the info window shows what the LoRA changes in a MiniMax H3 model. The widget keeps every setting of the stack that it does not show.
 
 **Slots:** ND LoRA Stack node \*
 
@@ -445,7 +449,7 @@ Shows the text of the ND Show Any As Text node. Needs Neural Dreamer Nodes.
 
 ### Variant Preview
 
-The variants of ND Variant Preview Selector: thumbnails, a switch to take several at once, the Upscale button, live frames and a before / after compare. Needs Neural Dreamer Nodes 1.3.1 or newer.
+The variants of ND Variant Preview Selector: thumbnails, a switch to take several at once, the Upscale button, live frames and a before / after compare. A click on the picture, or the Full size button, opens it large; the Save button downloads it. Needs Neural Dreamer Nodes 1.3.1 or newer.
 
 **Slots:** ND Variant Preview Selector node \*
 

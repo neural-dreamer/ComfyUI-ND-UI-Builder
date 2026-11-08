@@ -5,7 +5,7 @@
 </p>
 
 <p align="center">
-<img src="https://img.shields.io/badge/version-1.0.0-7c5cff" alt="version 1.0.0"> <a href="LICENSE"><img src="https://img.shields.io/badge/license-AGPL--3.0-blue" alt="license AGPL-3.0"></a>
+<img src="https://img.shields.io/badge/version-1.1.0-7c5cff" alt="version 1.1.0"> <a href="LICENSE"><img src="https://img.shields.io/badge/license-AGPL--3.0-blue" alt="license AGPL-3.0"></a>
 </p>
 
 # ComfyUI ND UI Builder
@@ -18,7 +18,7 @@
 
 <p align="center"><a href="https://youtu.be/c8wx4VMnxcE"><img src="docs/images/promo_video.webp" alt="ComfyUI ND UI Builder: промо-ролик" width="720"></a></p>
 
-<p align="center"><b><a href="https://youtu.be/c8wx4VMnxcE">Смотреть промо</a></b> (около 30 секунд: что это и что умеет)</p>
+<p align="center"><b><a href="https://youtu.be/c8wx4VMnxcE">Смотреть промо</a></b> (около минуты: что это и что умеет)</p>
 
 Пошаговые уроки собраны в одном плейлисте: [ComfyUI ND UI Builder на YouTube](https://www.youtube.com/playlist?list=PLGnUD4GeMWjo)
 
@@ -53,7 +53,7 @@
 
 Перезапустите ComfyUI и обновите страницу (Ctrl+F5). Рядом с **Run** появятся две кнопки, **ND UI** и **Edit**. Python-зависимостей нет. Проверено на фронтенде ComfyUI 1.55 и 1.57.
 
-Некоторым виджетам (Images Input, ввод видео / аудио, стек LoRA, Show Any As Text, превью вариантов) нужны ноды парного пака [Neural Dreamer Nodes](https://github.com/neural-dreamer/ComfyUI-NeuralDreamer-Nodes) версии 1.3.1 или новее. Сам Builder работает и без него.
+Некоторым виджетам (Images Input, ввод видео / аудио, стек LoRA, Show Any As Text, превью вариантов) нужны ноды парного пака [Neural Dreamer Nodes](https://github.com/neural-dreamer/ComfyUI-NeuralDreamer-Nodes) версии 1.3.1 или новее (для настроек времени стека LoRA H3 Temporal нужна 1.4.0). Сам Builder работает и без него.
 
 ## Быстрый старт
 

@@ -13,7 +13,17 @@ const ROOT = process.env.BENCH_DATA || __dirname;
 const WEB = path.join(ROOT, "web");
 const EXT = path.join(ROOT, "ext"); // served as /extensions/<pack>/...
 const PORT = Number(process.env.PORT || 8188);
-const objectInfo = () => JSON.parse(fs.readFileSync(path.join(ROOT, "object_info.json"), "utf8"));
+const EXTRA_MODELS = {}; // folder -> names "downloaded" while the server runs (POST /bench/models)
+const objectInfo = () => {
+    const oi = JSON.parse(fs.readFileSync(path.join(ROOT, "object_info.json"), "utf8"));
+    if (!Object.keys(EXTRA_MODELS).length) return oi;
+    const BY = { lora_name: "loras", ckpt_name: "checkpoints", unet_name: "diffusion_models" };
+    for (const nd of Object.values(oi)) for (const grp of ["required", "optional"]) for (const [k, spec] of Object.entries((nd.input || {})[grp] || {})) {
+        const f = BY[k], lst = Array.isArray(spec) && Array.isArray(spec[0]) ? spec[0] : null;
+        if (f && lst && EXTRA_MODELS[f]) for (const n of EXTRA_MODELS[f]) if (!lst.includes(n)) lst.push(n);
+    }
+    return oi;
+};
 const settings = {};
 const userdata = {};
 const prompts = [], frees = [];
@@ -62,6 +72,7 @@ const LORA_META = { "style_neon.safetensors": { title: "Neon Style", base: "SDXL
 const FAKE_MODELS = { loras: ["style_neon.safetensors", "style_anime.safetensors", "characters/hero_v2.safetensors", "characters/villain.safetensors", "detail_tweaker.safetensors"], checkpoints: ["sdxl_base.safetensors", "realistic_v5.safetensors"], diffusion_models: ["flux1-dev.safetensors", "wan2.2_t2v.safetensors"] };
 // what the pack's catalog says about every LoRA: kind of preview, the automatic NSFW level and the mark the person made
 const LORA_MEDIA = { "style_neon.safetensors": { kind: "image" }, "style_anime.safetensors": { kind: "video" }, "characters/hero_v2.safetensors": { kind: "image", level: 8 }, "characters/villain.safetensors": { kind: "" }, "detail_tweaker.safetensors": { kind: "image", level: 4 } };
+const BASE_MODELS = JSON.parse(JSON.stringify(FAKE_MODELS));
 const ND_LORAS = { on: true, marks: {}, posts: [] };
 function ndLoraRecord(n, i) {
     const md = LORA_MEDIA[n] || { kind: "" }, auto = (md.level || 0) >= 4, user = n in ND_LORAS.marks;
@@ -78,6 +89,8 @@ const server = http.createServer(async (req, res) => {
         if (fs.existsSync(ours)) return file(res, ours);
         return file(res, path.join(WEB, "extensions", rest));
     }
+    if (p === "/bench/models" && req.method === "POST") { let b = ""; for await (const c of req) b += c; const d = JSON.parse(b || "{}"); if (d.reset) { for (const f of Object.keys(EXTRA_MODELS)) { FAKE_MODELS[f] = BASE_MODELS[f].slice(); delete EXTRA_MODELS[f]; } return json(res, { ok: true }); } (FAKE_MODELS[d.folder] = FAKE_MODELS[d.folder] || []).push(d.name); (EXTRA_MODELS[d.folder] = EXTRA_MODELS[d.folder] || []).push(d.name); return json(res, { ok: true }); }
+    if (p === "/nd/loras/h3info") return json(res, { format: "safetensors", modules: 96, rank: [16, 32], timeable: true, fixed: 12, groups: { attn: 48, mlp: 32, adaln: 12, final: 4 }, match: 100, clip: false, dtype: "bf16" });
     if (p === "/object_info") return json(res, objectInfo());
     if (p.startsWith("/object_info/")) return json(res, { [p.split("/")[2]]: objectInfo()[p.split("/")[2]] });
     if (p === "/extensions") return json(res, extensionList());

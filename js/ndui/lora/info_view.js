@@ -9,16 +9,17 @@ import { mediaThumb, showLarge } from "./media.js";
 export const hasInfo = (m) => !!(m && ((m.words && m.words.length) || m.usage || m.notes || m.base || m.version));
 
 // «open the page of the LoRA» and «info»; both are dimmed and do nothing when there is nothing behind them
-export function infoButtons(m, tr, onInfo) {
+export function infoButtons(m, tr, onInfo, force = false) {   // force: the button works even when nothing is known (the H3 block has something to show)
     const box = el("span", "ndk-lr-ib");
     const page = el("button", "ndk-iconbtn ndk-lr-pg"); page.type = "button"; page.append(icon("external", 14));
     page.title = m?.url ? tr("Open the page of this LoRA") : tr("No page is known for this LoRA");
     page.disabled = !m?.url;
     page.addEventListener("click", (e) => { e.stopPropagation(); if (m?.url) window.open(m.url, "_blank", "noopener,noreferrer"); });
     const inf = el("button", "ndk-iconbtn ndk-lr-inf"); inf.type = "button"; inf.append(icon("info", 14));
-    inf.title = hasInfo(m) ? tr("Trigger words and notes of this LoRA") : tr("Nothing is known about this LoRA");
-    inf.disabled = !hasInfo(m);
-    inf.addEventListener("click", (e) => { e.stopPropagation(); if (hasInfo(m)) onInfo(inf); });
+    const can = hasInfo(m) || force;
+    inf.title = can ? tr("Trigger words and notes of this LoRA") : tr("Nothing is known about this LoRA");
+    inf.disabled = !can;
+    inf.addEventListener("click", (e) => { e.stopPropagation(); if (can) onInfo(inf); });
     for (const b of [page, inf]) b.addEventListener("pointerdown", (e) => e.stopPropagation());
     box.append(page, inf);
     return box;

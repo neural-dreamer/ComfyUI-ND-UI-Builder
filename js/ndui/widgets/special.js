@@ -3,7 +3,7 @@
 // ND UI widgets — Resolution, Model Picker, Text Output.
 import { el, icon, popup, clampN } from "./util.js";
 import { forNode, latestAny } from "../events.js";
-import { catalog, previewUrl, baseName, dirName } from "../models.js";
+import { catalog, previewUrl, baseName, dirName , modelsVersion } from "../models.js";
 
 /* ------------------------------------------------------------------ Resolution */
 
@@ -25,6 +25,8 @@ export const resolution = {
         { id: "showFam", kind: "bool", label: "Show the size of the model", def: true, hint: "Off: the button is hidden; the chosen size of the model is still used by the ratio buttons." },
         { id: "showMul", kind: "bool", label: "Show «Multiple of»", def: true, hint: "Off: the button is hidden; the chosen multiple is still used when sizes are rounded." },
         { id: "lock", kind: "bool", label: "Keep the ratio", def: false, hint: "Changing one side changes the other." },
+        { id: "mp", kind: "bool", label: "Set the size in megapixels", def: false, hint: "Adds a field for the area in megapixels. The ratio buttons aim at that area instead of the size of the model." },
+        { id: "mpValue", kind: "number", label: "Megapixels", def: 1, min: 0.01, max: 100, hint: "The area that the ratio buttons aim at while «Set the size in megapixels» is on. The field in the widget changes it too." },
     ],
     mount(ctx) {
         const root = el("div", "ndk-res");
@@ -41,7 +43,15 @@ export const resolution = {
         const opts = el("div", "ndk-res-opts");
         const fam = el("div", "ndk-chip"); fam.style.cursor = "pointer"; fam.title = ctx.tr("The size of the model: the buttons above aim at this area");
         const mul = el("div", "ndk-chip"); mul.style.cursor = "pointer"; mul.title = ctx.tr("Multiple of");
-        opts.append(fam, mul);
+        // the area in megapixels (optional, the property «mp»): ◀ [ 1.00 ] ▶
+        const mpBox = el("div", "ndk-res-mp"), mpIn = el("input", "ndk-input"), fmp = el("div", "ndk-field");
+        mpIn.type = "text"; mpIn.inputMode = "decimal"; mpIn.spellcheck = false; mpIn.title = ctx.tr("Size in megapixels"); fmp.append(mpIn);
+        const mpLess = el("button", "ndk-iconbtn"), mpMore = el("button", "ndk-iconbtn");
+        mpLess.type = mpMore.type = "button";
+        mpLess.title = ctx.tr("Smaller (Shift: bigger step)"); mpMore.title = ctx.tr("Bigger (Shift: bigger step)");
+        mpLess.append(icon("chevL", 14)); mpMore.append(icon("chevR", 14));
+        mpBox.append(el("span", "lab", "MP"), mpLess, fmp, mpMore);
+        opts.append(mpBox, fam, mul);
         main.append(ratios, size, opts);
         const view = el("div", "ndk-res-view"), box = el("div", "ndk-res-box"), rect = el("div", "ndk-res-rect"), info = el("div");
         box.append(rect); view.append(box, info);
@@ -62,7 +72,9 @@ export const resolution = {
             ctx.set("height", clampN(Math.round(h), lh.min, lh.max));
             show();
         };
-        const area = () => { const f = FAMILIES.find((x) => x[0] === famId()); const c = cur(); return f && f[2] ? f[2] : (c.w * c.h || 1024 * 1024); };
+        const mpOn = () => ctx.prop("mp") === true;
+        const mpVal = () => { const v = Number(String(ctx.prop("mpValue") ?? "").replace(",", ".")); return Number.isFinite(v) && v > 0 ? v : 1; };
+        const area = () => { if (mpOn()) return mpVal() * 1e6; const f = FAMILIES.find((x) => x[0] === famId()); const c = cur(); return f && f[2] ? f[2] : (c.w * c.h || 1024 * 1024); };
         const applyRatio = (rw, rh) => {
             const c = cur(), m = mult();
             const portrait = c.h > c.w;
@@ -72,6 +84,27 @@ export const resolution = {
             put(roundTo(w, m), roundTo(h, m));
             if (locked()) lockR = r;
         };
+        // a new area: the shape (the ratio of the sides) stays as it is now
+        const setMp = (v) => {
+            const mp = clampN(Math.round(v * 1000) / 1000, 0.01, 100);
+            ctx.setProp?.("mpValue", mp);
+            const c = cur(), m = mult();
+            const r = locked() && lockR ? lockR : (c.w && c.h ? c.w / c.h : 1);
+            const w = Math.sqrt(mp * 1e6 * r), h = w / r;
+            put(roundTo(w, m), roundTo(h, m));
+            if (locked()) lockR = r;
+            show();
+        };
+        const mpStep = (dir, shift) => setMp(Math.round((mpVal() + dir * (shift ? 0.5 : 0.1)) * 100) / 100);
+        mpIn.addEventListener("change", () => { const v = Number(mpIn.value.replace(",", ".")); if (Number.isFinite(v) && v > 0) setMp(v); else show(); });
+        mpIn.addEventListener("keydown", (e) => {
+            e.stopPropagation();
+            if (e.key === "Enter") mpIn.blur();
+            if (e.key === "ArrowUp" || e.key === "ArrowDown") { e.preventDefault(); mpStep(e.key === "ArrowUp" ? 1 : -1, e.shiftKey); }
+        });
+        mpIn.addEventListener("wheel", (e) => { if (!e.shiftKey) return; e.preventDefault(); e.stopPropagation(); mpStep(e.deltaY < 0 ? 1 : -1, false); }, { passive: false });
+        mpLess.addEventListener("click", (e) => mpStep(-1, e.shiftKey));
+        mpMore.addEventListener("click", (e) => mpStep(1, e.shiftKey));
         const commit = (which) => {
             const v = parseInt((which === "w" ? iw : ih).value, 10);
             const c = cur(), m = mult();
@@ -112,9 +145,10 @@ export const resolution = {
             const f = FAMILIES.find((x) => x[0] === famId());
             fam.textContent = ctx.tr(f ? f[1] : "SDXL · 1024");
             mul.textContent = `× ${Number(ctx.prop("multiple")) || 64}`;
-            const sf = ctx.prop("showFam") !== false, sm = ctx.prop("showMul") !== false;
-            fam.style.display = sf ? "" : "none"; mul.style.display = sm ? "" : "none";
-            opts.style.display = sf || sm ? "" : "none";
+            const sf = ctx.prop("showFam") !== false, sm = ctx.prop("showMul") !== false, mpo = mpOn();
+            fam.style.display = sf && !mpo ? "" : "none"; mul.style.display = sm ? "" : "none"; mpBox.style.display = mpo ? "" : "none";
+            opts.style.display = (sf && !mpo) || sm || mpo ? "" : "none";
+            if (document.activeElement !== mpIn) mpIn.value = String(+mpVal().toFixed(2));
             const k = RATIOS.map((r) => r.join(":")).join(",");
             if (rkey !== k) {
                 rkey = k; ratios.textContent = "";
@@ -158,12 +192,12 @@ export const modelpicker = {
             const hit = FOLDER_BY_NAME.find(([re]) => re.test(n));
             return hit ? hit[1] : "";
         };
-        let info = new Map(), loadedFor = "", seen = "";
+        let info = new Map(), loadedFor = "", seen = "", mv = modelsVersion;
         const load = (fresh) => { const fo = folderOf(); loadedFor = fo; if (!fo) { info = new Map(); show(); return Promise.resolve(); } return catalog(fo, fresh).then((m) => { if (loadedFor === fo) { info = m; seen = ""; show(); } }); };
         const show = () => {
             const v = ctx.get("value");
             const fo = folderOf();
-            if (fo !== loadedFor) load();
+            if (mv !== modelsVersion) { mv = modelsVersion; load(); } else if (fo !== loadedFor) load();   // R was pressed: read the folder again
             const text = v == null ? "" : String(v);
             const d = dirName(text);
             const k = `${text}|${info.size}|${fo}`;

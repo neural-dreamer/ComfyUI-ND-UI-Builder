@@ -7,7 +7,7 @@ ComfyUI ND UI Builder 可单独使用。配套插件 **Neural Dreamer Nodes** �
 | ND Load Images | Images Input |
 | ND Load Video | 视频输入 |
 | ND Load Audio | 音频输入 |
-| ND LoRA Stack | LoRA 堆栈 |
+| ND LoRA Stack、ND LoRA Stack H3 Temporal | LoRA 堆栈（时间设置：Nodes 1.4.0 或更新版本） |
 | ND Show Any As Text | Show Any As Text |
 | ND Variant Preview Selector | 变体预览 |
 | ND Slider、ND Resolution | 滑块、分辨率（作为虚拟参数） |

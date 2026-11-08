@@ -2,16 +2,16 @@
 // Copyright (c) 2026 Ivan Ovchinnikov (Neural Dreamer)
 // ND UI widgets — LoRA (the whole stack of an ND LoRA Stack node) and LoRA Picker (one LoRA of a standard Load LoRA node).
 import { el, icon } from "./util.js";
-import { catalog, dirName, stemName } from "../models.js";
+import { catalog, dirName, stemName, modelsVersion } from "../models.js";
 import { openGallery } from "../lora/gallery.js";
 import { mediaThumb } from "../lora/media.js";
-import { stackView, strengthRow, isStackNode, stackWidget, STACK_CLASS } from "../lora/stack_view.js";
+import { stackView, strengthRow, isStackNode, stackWidget, STACK_CLASSES } from "../lora/stack_view.js";
 
 const pctx = (ctx) => ({ tr: ctx.tr, vars: () => ctx.vars(), popupHost: () => ctx.popupHost() });
 
 export const lora = {
     type: "lora", label: "LoRA Stack", icon: "layers", group: "Run", fill: true,
-    slots: [{ id: "node", label: "ND LoRA Stack node", data: "lorastack", accepts: [STACK_CLASS], required: true, watch: (node) => String(node.widgets?.find((w) => w.name === "stack")?.value ?? "") }],
+    slots: [{ id: "node", label: "ND LoRA Stack node", data: "lorastack", accepts: STACK_CLASSES, required: true, watch: (node) => `${node.widgets?.find((w) => w.name === "stack")?.value ?? ""}|${node.widgets?.find((w) => w.name === "length")?.value ?? ""}` }],
     size: { w: 400, h: 300, minW: 260, minH: 120 },
     props: [
         { id: "clip", kind: "bool", label: "Show the CLIP slider", def: false, hint: "Off: the CLIP strength follows the model strength (as long as they are linked)." },
@@ -60,9 +60,10 @@ export const lorapicker = {
         const strengths = el("div", "ndk-lp-str");
         root.append(f, strengths);
         ctx.body.append(root);
-        let info = new Map(), seen = "";
+        let info = new Map(), seen = "", mv = modelsVersion;
         const lim = (id, fall) => { const l = ctx.limits(id); return [Number.isFinite(l.min) ? l.min : fall[0], Number.isFinite(l.max) ? l.max : fall[1]]; };
         const show = () => {
+            if (mv !== modelsVersion) { mv = modelsVersion; catalog("loras").then((m) => { info = m; seen = ""; show(); }); }   // R was pressed: read the folder again
             const v = ctx.get("lora_name"), text = v == null ? "" : String(v);
             const hasClip = ctx.info("strength_clip").bound;
             const sm = Number(ctx.get("strength_model")), sc = Number(ctx.get("strength_clip"));

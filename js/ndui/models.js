@@ -6,6 +6,22 @@ import { api } from "../../../scripts/api.js";
 
 const catalogs = new Map(); // folder -> Promise<Map name -> info>
 
+// Node definitions were reloaded (the R key of ComfyUI): files may have come or gone, so what was read is forgotten.
+// `modelsVersion` goes into the signature of every widget (render.js), so each widget is told once; a widget that keeps a catalog asks again.
+export let modelsVersion = 0;
+const MODELS_EVENT = "ndui:models-changed";
+export function refreshModels() {
+    catalogs.clear();
+    modelsVersion++;
+    try { window.dispatchEvent(new CustomEvent(MODELS_EVENT, { detail: { version: modelsVersion } })); } catch {}
+}
+// fn() runs after the lists were reset; returns the function that stops listening
+export function onModelsChanged(fn) {
+    const h = () => fn();
+    window.addEventListener(MODELS_EVENT, h);
+    return () => window.removeEventListener(MODELS_EVENT, h);
+}
+
 // The catalog of a folder of models. LoRAs come from Neural Dreamer Nodes (GET /nd/loras: video previews, the NSFW flag and marks, entry.src = "nd")
 // when that pack is installed, and from this pack's own list (GET /ndui/models/loras: pictures only) when it is not.
 // A preview is {kind: "image"|"video", v, image}|null in the first, true|false in the second: read it with previewOf().

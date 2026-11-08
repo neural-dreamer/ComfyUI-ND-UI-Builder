@@ -7,7 +7,7 @@ ComfyUI ND UI Builder works on its own. The companion pack **Neural Dreamer Node
 | ND Load Images | Images Input |
 | ND Load Video | Video Input |
 | ND Load Audio | Audio Input |
-| ND LoRA Stack | LoRA Stack |
+| ND LoRA Stack, ND LoRA Stack H3 Temporal | LoRA Stack (time settings: Nodes 1.4.0 or newer) |
 | ND Show Any As Text | Show Any As Text |
 | ND Variant Preview Selector | Variant Preview |
 | ND Slider, ND Resolution | Slider, Resolution (as virtual parameters) |

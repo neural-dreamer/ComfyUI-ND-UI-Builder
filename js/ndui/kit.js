@@ -269,7 +269,7 @@ const R = (x, y, w, h, r = 0) => `<rect x="${x}" y="${y}" width="${w}" height="$
 const ICONS = {
     plug: P("M9 3v5M15 3v5M6 8h12v3a6 6 0 0 1-12 0V8zM12 17v4"),
     speaker: P("M4 9v6h4l5 4V5L8 9H4z") + P("M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"), speakerOff: P("M4 9v6h4l5 4V5L8 9H4z") + P("M17 9l5 6M22 9l-5 6"),
-    info: C(12, 12, 9) + P("M12 11v5.5M12 7.6v.2"),
+    info: C(12, 12, 9) + P("M12 11v5.5M12 7.6v.2"), clock: C(12, 12, 9) + P("M12 7v5l3 2"),
     plus: P("M12 5v14M5 12h14"), minus: P("M5 12h14"), x: P("M6 6l12 12M18 6L6 18"), check: P("M5 12.5l4.5 4.5L19 7.5"),
     chevD: P("M6 9l6 6 6-6"), chevU: P("M6 15l6-6 6 6"), chevR: P("M9 6l6 6-6 6"), chevL: P("M15 6l-6 6 6 6"),
     search: C(10.5, 10.5, 6.5) + P("M15.5 15.5L20 20"),

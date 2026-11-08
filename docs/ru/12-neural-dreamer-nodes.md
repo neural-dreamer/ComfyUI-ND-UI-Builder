@@ -7,7 +7,7 @@ ComfyUI ND UI Builder работает и сам по себе. Парный п�
 | ND Load Images | Images Input |
 | ND Load Video | Ввод видео |
 | ND Load Audio | Ввод аудио |
-| ND LoRA Stack | Стек LoRA |
+| ND LoRA Stack, ND LoRA Stack H3 Temporal | Стек LoRA (настройки времени: Nodes 1.4.0 и новее) |
 | ND Show Any As Text | Show Any As Text |
 | ND Variant Preview Selector | Превью вариантов |
 | ND Slider, ND Resolution | Ползунок, Разрешение (как виртуальные параметры) |

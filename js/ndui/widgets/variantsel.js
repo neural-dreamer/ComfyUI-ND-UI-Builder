@@ -5,6 +5,8 @@
 // and the live preview. It talks to the node only through node.ndApi (kind "variant-preview"), so the node and the widget always show the same state;
 // the live frames reach the node (from ComfyUI or from an ND Live Preview Bridge) and the widget shows what the node got.
 import { el, icon } from "./util.js";
+import { openLightbox } from "./media.js";
+import { downloadUrl } from "../media/io.js";
 
 export const VARIANT_CLASS = "NDVariantPreviewSelector";
 export const isVariantNode = (n) => !!n && (n.comfyClass || n.type) === VARIANT_CLASS;
@@ -44,7 +46,9 @@ export const variantsel = {
             const tools = el("div", "tools");
             const eye = el("button", "tbtn eye"); eye.type = "button";
             const cmpBtn = el("button", "tbtn cmpb"); cmpBtn.type = "button"; cmpBtn.append(icon("compare", 15)); cmpBtn.title = ctx.tr("Before / after");
-            tools.append(cmpBtn, eye);
+            const mkBtn = (cls, ic, title) => { const b = el("button", "tbtn " + cls); b.type = "button"; b.title = ctx.tr(title); b.append(icon(ic, 15)); return b; };
+            const saveBtn = mkBtn("save", "download", "Save"), fullBtn = mkBtn("full", "expand", "Full size");
+            tools.append(cmpBtn, eye, saveBtn, fullBtn);
             stage.append(img, cmp, live, empty, badge, liveBadge, tools);
             const info = el("div", "info");
             const thumbs = el("div", "thumbs");
@@ -54,7 +58,22 @@ export const variantsel = {
             const up = el("button", "up"); up.type = "button"; up.append(icon("upload", 15), el("span", "", ctx.tr("Upscale")));
             bar.append(sw, el("span", "sp"), up);
             root.append(stage, info, thumbs, bar);
-            Object.assign(view, { stage, img, cmp, cmpUp, cmpSrc, cmpLine, live, empty, badge, liveBadge, eye, cmpBtn, info, thumbs, bar, sw, swIn, swLabel, up, pos: 50, thumbKey: "" });
+            Object.assign(view, { saveBtn, fullBtn, stage, img, cmp, cmpUp, cmpSrc, cmpLine, live, empty, badge, liveBadge, eye, cmpBtn, info, thumbs, bar, sw, swIn, swLabel, up, pos: 50, thumbKey: "" });
+
+            // a click on the picture (or the Full size button) opens it in full size, as in the Viewer widget; Save downloads what is shown
+            const shownUrl = () => { const st = apiOf(node)?.getState(); if (!st) return null; if (view.live.style.display !== "none" && view.live.src) return { url: view.live.src, name: "preview.jpg" }; const c = st.viewFinal ? st.final : st.images[st.sel]; return c ? { url: c.url, name: c.filename || (st.viewFinal ? "upscaled.png" : `variant_${st.sel + 1}.png`) } : null; };
+            const fullOpen = () => {
+                const st = apiOf(node)?.getState(); if (!st) return;
+                if (view.live.style.display !== "none" && view.live.src) return openLightbox(ctx, [{ url: view.live.src, name: "preview" }], 0);
+                const items = st.images.map((im, i) => ({ url: im.url, name: ctx.tr("Variant") + " " + (i + 1) }));
+                if (st.final) items.push({ url: st.final.url, name: ctx.tr("Upscaled") });
+                if (!items.length) return;
+                openLightbox(ctx, items, st.viewFinal && st.final ? items.length - 1 : Math.max(0, st.sel));
+            };
+            stage.addEventListener("click", (e) => { if (e.target.closest(".tools") || e.target.closest(".cmp")) return; fullOpen(); });
+            saveBtn.addEventListener("click", (e) => { e.stopPropagation(); const it = shownUrl(); if (it) downloadUrl(it.url, it.name); });
+            fullBtn.addEventListener("click", (e) => { e.stopPropagation(); fullOpen(); });
+            stage.style.cursor = "zoom-in";
 
             swIn.addEventListener("change", () => act("setMulti", swIn.checked));
             up.addEventListener("click", () => act("upscale"));
@@ -95,6 +114,7 @@ export const variantsel = {
             if (cmpOn) { setSrc(view.cmpUp, s.final.url); setSrc(view.cmpSrc, s.source.url); view.cmpSrc.style.clipPath = `inset(0 ${100 - view.pos}% 0 0)`; view.cmpLine.style.left = view.pos + "%"; }
             view.cmpBtn.style.display = s.viewFinal && s.source && !liveShow ? "" : "none";
             view.cmpBtn.classList.toggle("on", s.compare);
+            { const has = !!cur || liveShow; view.saveBtn.style.display = has ? "" : "none"; view.fullBtn.style.display = has ? "" : "none"; }
             view.empty.style.display = cur || liveShow ? "none" : "";
             setSrc(view.live, liveShow ? s.live.url : "");
             view.live.style.display = liveShow ? "" : "none";

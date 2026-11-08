@@ -144,4 +144,16 @@ html[data-nd-nsfw="show"] .ndk-lg-card .pic.nsfw .bgblur{filter:blur(14px) brigh
 .ndk-li-pic:hover{border-color:var(--ndk-accent)}
 .ndk-li-big{position:fixed;inset:0;z-index:2147483600;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(4,6,10,.82);cursor:zoom-out}
 .ndk-li-big img{max-width:100%;max-height:100%;object-fit:contain;border-radius:8px;box-shadow:0 20px 60px rgba(0,0,0,.6)}
+.ndk-lr .ndk-lr-clock{width:26px;height:26px;border-radius:var(--ndk-rs)}
+.ndk-lr-clock.on{color:var(--ndk-accent)}
+.ndk-lr-clock.open{background:color-mix(in srgb,var(--ndk-accent) 22%,transparent)}
+.ndk-lr-nb{margin-left:2px;font-size:10px;font-weight:600}
+.ndk-lr-time{--nd-accent:var(--ndk-accent);--input-text:var(--ndk-text);--border-color:var(--ndk-border-strong);--comfy-input-bg:var(--ndk-field-bg);min-width:0;margin-top:2px;padding-top:8px;border-top:1px solid var(--ndk-border)}
+.ndk-h3-kv{display:flex;flex-wrap:wrap;gap:3px 16px;font-size:12px}
+.ndk-h3-kv span{color:var(--ndk-faint)}
+.ndk-h3-chips{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
+.ndk-h3-chip{padding:1px 8px;border:1px solid var(--ndk-border-strong);border-radius:999px;font-size:11px;line-height:1.5}
+.ndk-h3-chip.fixed{border-style:dashed;color:var(--ndk-faint)}
+.ndk-h3-warn{margin-top:8px;color:var(--ndk-danger);font-size:12px;line-height:1.4}
+.ndk-h3-note{margin-top:8px;color:var(--ndk-faint);font-size:12px;line-height:1.4}
 `;

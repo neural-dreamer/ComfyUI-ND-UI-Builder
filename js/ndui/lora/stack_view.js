@@ -3,14 +3,21 @@
 // ND UI — the stack of LoRAs (the NDLoraStack node of Neural Dreamer Nodes): reading and writing the list, and the view that edits it (the LoRA widget:
 // cards with pictures or video previews, sliders with arrows, trigger words). The node has its own list inside it (Neural Dreamer Nodes).
 import { el, icon, popup } from "../widgets/util.js";
-import { catalog, isNd, dirName, stemName, stackPresets } from "../models.js";
+import { catalog, isNd, dirName, stemName, stackPresets, modelsVersion } from "../models.js";
 import { mediaThumb, nsfwButton, shieldButton } from "./media.js";
 import { openGallery } from "./gallery.js";
 import { infoButtons, fillInfo } from "./info_view.js";
 import { touchWorkflow } from "../sources.js";
+import { h3Block } from "./h3_view.js";
 
 export const STACK_CLASS = "NDLoraStack";
-export const isStackNode = (node) => !!node && (node.comfyClass === STACK_CLASS || node.type === STACK_CLASS);
+export const TEMPORAL_CLASS = "NDLoraStackH3Temporal";   // the same stack with the time settings on every row (Neural Dreamer Nodes 1.4.0)
+export const STACK_CLASSES = [STACK_CLASS, TEMPORAL_CLASS];
+export const isStackNode = (node) => !!node && STACK_CLASSES.some((c) => node.comfyClass === c || node.type === c);
+export const isTemporalNode = (node) => !!node && (node.comfyClass === TEMPORAL_CLASS || node.type === TEMPORAL_CLASS);
+// the tools of Neural Dreamer Nodes for time settings (window.ndLoraTemporal), or null when that pack is older or absent
+export const temporalApi = () => { const a = typeof window !== "undefined" ? window.ndLoraTemporal : null; return a && a.version >= 1 && typeof a.temporalEditor === "function" ? a : null; };
+export const lengthOf = (node) => { const v = Number(node?.widgets?.find((w) => w.name === "length")?.value); return Number.isFinite(v) && v > 0 ? v : 124; };
 
 /* ------------------------------------------------------------------ the list in the hidden widget `stack` */
 
@@ -21,6 +28,7 @@ export function normalize(raw) {
     try { a = JSON.parse(raw); } catch {}
     if (!Array.isArray(a)) return [];
     return a.filter((e) => e && typeof e.name === "string" && e.name).map((e) => ({
+        ...e,   // fields this widget does not know (t = the time settings) travel with the entry untouched
         name: e.name, on: e.on !== false, sm: Number.isFinite(+e.sm) ? +e.sm : 1,
         sc: Number.isFinite(+e.sc) ? +e.sc : Number.isFinite(+e.sm) ? +e.sm : 1, link: e.link !== false,
         words: Array.isArray(e.words) ? e.words.map(String) : [],
@@ -31,7 +39,7 @@ export const stackText = (node) => String(stackWidget(node)?.value ?? "");
 export function writeStack(node, list) {
     const w = stackWidget(node);
     if (!w) return false;
-    const v = JSON.stringify(list.map((e) => ({ name: e.name, on: e.on, sm: +e.sm.toFixed(3), sc: e.link ? +e.sm.toFixed(3) : +e.sc.toFixed(3), link: e.link, words: e.words })));
+    const v = JSON.stringify(list.map((e) => ({ ...e, name: e.name, on: e.on, sm: +e.sm.toFixed(3), sc: e.link ? +e.sm.toFixed(3) : +e.sc.toFixed(3), link: e.link, words: e.words })));
     w.value = v;
     try { w.callback?.(v, null, node); } catch {}
     try { node.graph?.setDirtyCanvas?.(true, false); } catch {}
@@ -118,7 +126,9 @@ export function stackView(opts) {
     const bar = el("div", "ndk-lr-bar");
     root.append(listEl, bar);
     const P = () => { const p = opts.props?.() || {}; const lo = Number.isFinite(+p.rmin) ? +p.rmin : -1.5, hi = Number.isFinite(+p.rmax) ? +p.rmax : 1.5; return { play: p.play === "always" ? "always" : "hover", rmin: Math.min(lo, hi), rmax: Math.max(lo, hi), arrows: p.arrows !== false }; };
-    let info = new Map(), seen = null, list = [], pseen = "";
+    let info = new Map(), seen = null, list = [], pseen = "", mv = modelsVersion, lseen = 0;
+    const temporal = isTemporalNode(node);
+    const openT = new Set();   // the rows whose time settings are open (by the name of the LoRA); kept while the view redraws
 
     const commit = (redraw = true) => { writeStack(node, list); seen = stackText(node); if (redraw) draw(); };
     const move = (from, to) => { if (from === to || from < 0 || to < 0) return; const [x] = list.splice(from, 1); list.splice(to, 0, x); commit(); };
@@ -167,6 +177,15 @@ export function stackView(opts) {
 
     const strength = (label, value, onInput, off) => { const p = P(); return strengthRow(label, value, onInput, { off, onSettle: draw, range: [p.rmin, p.rmax], fixed: true, free: true, arrows: p.arrows, tr }); };
 
+    // the clock of a row: lit when the LoRA works only in chosen seconds (the number of ranges stands on it)
+    const paintClock = (btn, e) => {
+        const api = temporalApi(), t = api?.normalizeTemporal(e.t), timed = !!api && api.isTimed(t);
+        btn.classList.toggle("on", timed); btn.classList.toggle("open", openT.has(e.name));
+        btn.replaceChildren(icon("clock", 14));
+        if (timed) btn.append(el("span", "ndk-lr-nb", String(t.ranges.length)));
+        btn.title = timed ? tr("Works only in the chosen seconds. Click to change.") : tr("Time settings: the LoRA works on the whole video. Click to set the seconds.");
+    };
+
     const row = (e, i) => {
         const m = info.get(e.name);
         const c = el("div", `ndk-lr-card${e.on ? "" : " off"}`); c.dataset.i = String(i);
@@ -185,10 +204,19 @@ export function stackView(opts) {
         {
             const ib = infoButtons(m, tr, (anchor) => popup(pctx, anchor, {
                 width: 340, maxH: 420,
-                build(pbox) { fillInfo(pbox, { ...m, words: wordsOf(e) }, { tr, title: m?.title || stemName(e.name), chosen: e.words, onChosen: (w) => { e.words = w; commit(false); }, picture: { folder: "loras" } }); },
-            }));
+                build(pbox) {
+                    fillInfo(pbox, { ...m, words: wordsOf(e) }, { tr, title: m?.title || stemName(e.name), chosen: e.words, onChosen: (w) => { e.words = w; commit(false); }, picture: { folder: "loras" } });
+                    if (temporal) h3Block(pbox.querySelector(".ndk-li-body") || pbox, e.name, tr);   // what the LoRA changes in MiniMax H3
+                },
+            }), temporal);
+            let clock = null;
+            if (temporal && temporalApi()) {
+                clock = el("button", "ndk-iconbtn ndk-lr-clock"); clock.type = "button"; paintClock(clock, e);
+                clock.addEventListener("click", () => { if (openT.has(e.name)) openT.delete(e.name); else openT.add(e.name); draw(); });
+                clock.addEventListener("pointerdown", (ev) => ev.stopPropagation());
+            }
             const shield = m && isNd(m) ? shieldButton(pctx, m, "ndk-iconbtn ndk-lr-shield", () => media.setNsfw(m.nsfw)) : null;
-            top.append(grip, pic, nm, ib, ...(shield ? [shield] : []), sw, del);
+            top.append(grip, pic, nm, ...(clock ? [clock] : []), ib, ...(shield ? [shield] : []), sw, del);
             c.append(top);
             const body = el("div", "ndk-lr-body");
             body.append(strength(tr("Model"), e.sm, (v) => { e.sm = v; if (e.link) e.sc = v; commit(false); }));
@@ -199,6 +227,12 @@ export function stackView(opts) {
             clipRow.append(lk);
             body.append(clipRow);
             c.append(body);
+            if (clock && openT.has(e.name)) {
+                // the timeline of Neural Dreamer Nodes (ranges, fades, the switch for the sound): it writes the field `t` of the entry
+                const panel = el("div", "ndk-lr-time");
+                const ed = temporalApi().temporalEditor({ entry: e, length: lengthOf(node), tr, onChange: (t, final) => { e.t = t; paintClock(clock, e); if (final) commit(false); } });
+                panel.append(ed.el); c.append(panel);
+            }
             // the order: drag by the grip
             grip.draggable = true;
             grip.addEventListener("dragstart", (ev) => { ev.dataTransfer.setData("application/x-nd-lora", String(i)); ev.dataTransfer.effectAllowed = "move"; setTimeout(() => c.classList.add("drag"), 0); });
@@ -224,8 +258,9 @@ export function stackView(opts) {
     };
 
     function draw() {
-        list = readStack(node); seen = stackText(node); pseen = JSON.stringify(P());
+        list = readStack(node); seen = stackText(node); pseen = JSON.stringify(P()); lseen = temporal ? lengthOf(node) : 0;
         listEl.textContent = "";
+        if (temporal && !temporalApi()) listEl.append(el("div", "ndk-lr-empty warn", tr("The time settings need Neural Dreamer Nodes 1.4.0 or newer.")));
         if (!list.length) listEl.append(el("div", "ndk-lr-empty", tr("No LoRAs yet. Press + LoRA.")));
         list.forEach((e, i) => listEl.append(row(e, i)));
         bar.textContent = "";
@@ -240,7 +275,10 @@ export function stackView(opts) {
     return {
         el: root,
         // called by the page: the list is redrawn only when somebody else changed it
-        update() { if (stackText(node) !== seen || JSON.stringify(P()) !== pseen) draw(); },
+        update() {
+            if (mv !== modelsVersion) { mv = modelsVersion; this.refresh(); return; }   // R was pressed: the files may have changed
+            if (stackText(node) !== seen || JSON.stringify(P()) !== pseen || (temporal && lengthOf(node) !== lseen)) draw();
+        },
         refresh() { catalog("loras", true).then((m) => { info = m; draw(); }); },
     };
 }

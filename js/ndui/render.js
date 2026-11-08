@@ -12,7 +12,8 @@ import { adaptGeo, adaptedUi } from "./adapt.js";
 import { OpenState } from "./openstate.js";
 import { touchWorkflow } from "./sources.js";
 import { api } from "../../../scripts/api.js";
-import { events, startEvents } from "./events.js";
+import { events, startEvents, bridgeFor, bridgeHasAudio, anyBridgeAudio } from "./events.js";
+import { modelsVersion } from "./models.js";
 import { installTips } from "./tip.js";
 
 const CASCADE = ["style", "shape", "accent", "field", "text", "labelColor", "border", "shadow", "blur"]; // a panel hands these to the widgets lying in it
@@ -493,12 +494,14 @@ export class PageView {
         for (const f of this.frames.values()) {
             const def = f.def;
             if (!def) continue;
-            let sig = this.page + "|" + (this.mode) + (def.live ? "|e" + events.version : "");
+            let sig = this.page + "|" + (this.mode) + "|m" + modelsVersion + (def.live ? "|e" + events.version : "");
             for (const s of def.slots) {
                 const st = resolveSlot(this.ui, f.w, s.id, s);
                 const v = st.bound ? st.value : f.local[s.id];
                 sig += `|${s.id}:${typeof v === "object" ? JSON.stringify(v) : v}:${st.bound ? 1 : 0}${st.lost ? "L" : ""}${st.linked ? "W" : ""}${st.muted ? "M" : ""}${st.bypassed ? "B" : ""}:${st.options?.length ?? ""}`;
             }
+            // the speaker and the volume of a live preview follow the audio VAE pin of the bridge, so a wire put or pulled out redraws the widget
+            if (def.live) { try { const ls = def.slots.some((x) => x.id === "live") ? resolveSlot(this.ui, f.w, "live", def.slots.find((x) => x.id === "live")) : null; sig += "|au" + (ls?.bound ? (ls.node && bridgeHasAudio(bridgeFor(ls.node)) ? 1 : 0) : anyBridgeAudio() ? 1 : 0); } catch {} }
             if (sig !== f.sig) {
                 f.sig = sig;
                 this.applyState(f);

@@ -275,6 +275,8 @@
 | 显示模型尺寸 | 开 | 关闭：按钮隐藏，但比例按钮仍使用所选的模型尺寸。 |
 | 显示「倍数」 | 开 | 关闭：按钮隐藏，但取整尺寸时仍使用所选的倍数。 |
 | 保持比例 | 关 | 修改一边会同时改变另一边。 |
+| 以百万像素设置尺寸 | 关 | 添加带 ◀ ▶ 的 **MP** 输入框（步长 0.1，按住 Shift 为 0.5）：比例按钮随后以该面积为目标，不再使用模型尺寸。输入数字会保持画面的形状。 |
+| 百万像素 | 1 | 上述模式使用的面积（0.01 – 100）。控件中的输入框也会修改它。 |
 
 ### 模型选择器
 
@@ -290,7 +292,9 @@
 
 ### LoRA 堆栈
 
-Neural Dreamer Nodes 的 LoRA 堆栈，带预览图库。需要 ND LoRA Stack 节点。
+Neural Dreamer Nodes 的 LoRA 堆栈，带预览图库。需要 ND LoRA Stack 节点或 **ND LoRA Stack H3 Temporal** 节点。
+
+使用 H3 Temporal 节点（Neural Dreamer Nodes **1.4.0** 或更新版本）时，每张卡片都有一个时钟按钮：直接在卡片中打开该 LoRA 的时间设置（区间、淡入淡出、音频），信息窗口会显示该 LoRA 在 MiniMax H3 模型中修改的内容。控件会保留堆栈中它未显示的所有设置。
 
 **插槽:** ND LoRA Stack 节点 \*
 
@@ -445,7 +449,7 @@ Neural Dreamer Nodes 的 LoRA 堆栈，带预览图库。需要 ND LoRA Stack �
 
 ### 变体预览
 
-ND Variant Preview Selector 的各个变体：缩略图、多选开关、Upscale 按钮、实时画面和前后对比。需要 Neural Dreamer Nodes 1.3.1 或更高版本。
+ND Variant Preview Selector 的各个变体：缩略图、多选开关、Upscale 按钮、实时画面和前后对比。需要 Neural Dreamer Nodes 1.3.1 或更高版本。点击图片或 Full size 按钮可放大查看，Save 按钮可下载图片。
 
 **插槽:** ND Variant Preview Selector 节点 \*
 
