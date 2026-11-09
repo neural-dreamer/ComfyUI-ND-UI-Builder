@@ -59,6 +59,9 @@ ib = J("[...document.querySelectorAll('%s.ndk-lr-card')][0].querySelectorAll('.n
 info = J("(()=>{const b=document.querySelector('%s.ndk-lr-card .ndk-lr-inf'); if(!b) return false; b.click(); return true})()" % M)
 pg.wait_for_timeout(900)
 check("the info window has the H3 block", info and J("!!document.querySelector('.ndk-h3-kv')"), str(info))
+chips = J("[...document.querySelectorAll('.ndk-h3-chip')].map(c=>{const r=c.getBoundingClientRect(); return [getComputedStyle(c).position, r.left, r.top, r.right, r.bottom, c.className]})")
+ov = [(a[5], b[5]) for ii, a in enumerate(chips) for b in chips[ii + 1:] if a[1] < b[3] and b[1] < a[3] and a[2] < b[4] and b[2] < a[4]]
+check("the chips of the groups are in the flow and do not overlap (an always-on group is one of them)", len(chips) >= 3 and all(c[0] == "static" for c in chips) and not ov and any("whole" in c[5] for c in chips), str((chips, ov)))
 pg.keyboard.press("Escape"); pg.wait_for_timeout(300)
 # the plain stack: no clock, no H3 block requirement
 SET("NDLoraStack", [E("style_neon.safetensors", zz="plain-keep")])

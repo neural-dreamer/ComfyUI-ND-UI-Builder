@@ -27,7 +27,7 @@ export function h3Block(box, name, tr) {
         item(tr("Always on the whole video"), i.fixed);
         body.append(kv);
         const chips = el("div", "ndk-h3-chips");
-        for (const [g, n] of Object.entries(i.groups || {})) chips.append(el("span", `ndk-h3-chip${FIXED_GROUPS.has(g) ? " fixed" : ""}`, `${tr(GROUP_NAMES[g] || g)} \u00b7 ${n}`));
+        for (const [g, n] of Object.entries(i.groups || {})) chips.append(el("span", `ndk-h3-chip${FIXED_GROUPS.has(g) ? " whole" : ""}`, `${tr(GROUP_NAMES[g] || g)} \u00b7 ${n}`));
         body.append(chips);
         if (i.match < 50) body.append(el("div", "ndk-h3-warn", tr("This LoRA does not look like a MiniMax H3 LoRA: most of its layers are not in the model.")));
         else if (i.fixed && i.fixed >= i.modules / 2) body.append(el("div", "ndk-h3-warn", tr("Most layers of this LoRA cannot be placed in time, so ranges will change it only a little.")));

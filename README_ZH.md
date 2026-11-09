@@ -5,7 +5,7 @@
 </p>
 
 <p align="center">
-<img src="https://img.shields.io/badge/version-1.1.0-7c5cff" alt="version 1.1.0"> <a href="LICENSE"><img src="https://img.shields.io/badge/license-AGPL--3.0-blue" alt="license AGPL-3.0"></a>
+<img src="https://img.shields.io/badge/version-1.1.1-7c5cff" alt="version 1.1.1"> <a href="LICENSE"><img src="https://img.shields.io/badge/license-AGPL--3.0-blue" alt="license AGPL-3.0"></a>
 </p>
 
 # ComfyUI ND UI Builder

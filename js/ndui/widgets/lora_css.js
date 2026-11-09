@@ -153,7 +153,7 @@ html[data-nd-nsfw="show"] .ndk-lg-card .pic.nsfw .bgblur{filter:blur(14px) brigh
 .ndk-h3-kv span{color:var(--ndk-faint)}
 .ndk-h3-chips{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
 .ndk-h3-chip{padding:1px 8px;border:1px solid var(--ndk-border-strong);border-radius:999px;font-size:11px;line-height:1.5}
-.ndk-h3-chip.fixed{border-style:dashed;color:var(--ndk-faint)}
+.ndk-h3-chip.whole{border-style:dashed;color:var(--ndk-faint)}
 .ndk-h3-warn{margin-top:8px;color:var(--ndk-danger);font-size:12px;line-height:1.4}
 .ndk-h3-note{margin-top:8px;color:var(--ndk-faint);font-size:12px;line-height:1.4}
 `;
