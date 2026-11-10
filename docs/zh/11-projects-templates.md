@@ -6,7 +6,7 @@
 
 - 模式右上角的软盘按钮用于保存（**Save**），并带有小菜单：**Save as**、**Open**。
 - 在基于 Chromium 的浏览器中，第一次保存会询问文件位置，之后写入同一文件。
-- 设置 **ComfyUI ND UI Builder → Project files → Open a project** 决定项目是**在新标签页**中打开（默认）还是**替换当前工作流**。
+- 设置 **ND UI Builder → Project files → Open a project** 决定项目是**在新标签页**中打开（默认）还是**替换当前工作流**。
 - 按钮的位置、是否显示以及文件类型在页面设置的 *View* 部分设置。
 
 ## 模板

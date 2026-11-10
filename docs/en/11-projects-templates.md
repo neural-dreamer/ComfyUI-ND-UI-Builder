@@ -6,7 +6,7 @@ A **project** is the whole workflow together with its panel, saved as one file (
 
 - The floppy button in the top corner of the mode saves (**Save**) and has a small menu: **Save as**, **Open**.
 - In Chromium-based browsers the first Save asks where to put the file, later saves write into the same file.
-- The setting **ComfyUI ND UI Builder → Project files → Open a project** chooses whether a project opens **in a new tab** (default) or **replaces the current workflow**.
+- The setting **ND UI Builder → Project files → Open a project** chooses whether a project opens **in a new tab** (default) or **replaces the current workflow**.
 - The corner of the button, its visibility and the file type are set in the *View* section of the page settings.
 
 ## Templates

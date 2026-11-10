@@ -1,7 +1,7 @@
 [project]
 name = "comfyui-neuraldreamer-ui-builder"
 description = "ComfyUI ND UI Builder — build your own stylish control panel for ComfyUI: bind widgets to parameters of any nodes, lay them out freely, run the whole workflow from a clean full-window interface."
-version = "1.1.1"
+version = "1.1.2"
 license = "AGPL-3.0-only"
 license-files = ["LICENSE", "LICENSES/*.txt", "js/fonts/Inter-LICENSE.txt"]
 authors = [{ name = "Ivan Ovchinnikov (Neural Dreamer)", email = "ivan.kvento@gmail.com" }]

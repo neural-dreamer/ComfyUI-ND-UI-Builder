@@ -20,7 +20,7 @@ Each item has its own scale and style. Drag the items on the ghost of the panel 
 
 ## Hotkeys
 
-While the mode is on, the ComfyUI hotkeys are paused so that typing in a prompt cannot trigger a command by mistake. In the ComfyUI settings (**ComfyUI ND UI Builder → ND UI mode**) you can allow single commands: press **Add ComfyUI Hotkey**, pick the commands that should keep working. Browser shortcuts (copy, paste, select all) always work.
+While the mode is on, the ComfyUI hotkeys are paused so that typing in a prompt cannot trigger a command by mistake. In the ComfyUI settings (**ND UI Builder → ND UI mode**) you can allow single commands: press **Add ComfyUI Hotkey**, pick the commands that should keep working. Browser shortcuts (copy, paste, select all) always work.
 
 **Alt+Q** opens the workflow switcher (hold Alt, press Q to step through, release Alt to switch). **Ctrl+S** saves the project when the mode is on and the panel has a project file.
 

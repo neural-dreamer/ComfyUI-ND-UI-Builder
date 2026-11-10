@@ -1,6 +1,6 @@
 # FAQ
 
-**I do not see the ND UI and Edit buttons.** Reload the page with Ctrl+F5. Check the setting *ComfyUI ND UI Builder → Buttons → Action bar → Show the ND UI and Edit buttons next to Run*.
+**I do not see the ND UI and Edit buttons.** Reload the page with Ctrl+F5. Check the setting *ND UI Builder → Buttons → Action bar → Show the ND UI and Edit buttons next to Run*.
 
 **A widget says it is not bound.** The node or its tag was not found. Open the editor, **Link** tab, and bind it again.
 
@@ -12,7 +12,7 @@
 
 **I downloaded a new model and pressed R, but the panel does not show it.** Press R once more in ComfyUI: the lists, the pickers and the LoRA gallery of the panel read the folders again when the node definitions are refreshed. The LoRA Stack widget needs Neural Dreamer Nodes 1.4.0 or newer for this.
 
-**Hotkeys of ComfyUI do not work in the mode.** That is on purpose. Allow commands in the ComfyUI settings, *ComfyUI ND UI Builder → ND UI mode*.
+**Hotkeys of ComfyUI do not work in the mode.** That is on purpose. Allow commands in the ComfyUI settings, *ND UI Builder → ND UI mode*.
 
 **The page is blurry or slow on a weak machine.** Choose a theme without blur (Midnight, Studio, ComfyUI), or turn *Use blur* off.
 

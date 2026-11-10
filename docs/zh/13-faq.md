@@ -1,6 +1,6 @@
 # 常见问题
 
-**看不到 ND UI 和 Edit 按钮。** 用 Ctrl+F5 刷新页面。检查设置 *ComfyUI ND UI Builder → Buttons → Action bar → Show the ND UI and Edit buttons next to Run*。
+**看不到 ND UI 和 Edit 按钮。** 用 Ctrl+F5 刷新页面。检查设置 *ND UI Builder → Buttons → Action bar → Show the ND UI and Edit buttons next to Run*。
 
 **控件提示未绑定。** 节点或其标签找不到。打开编辑器的**关联**标签，重新绑定。
 
@@ -12,7 +12,7 @@
 
 **我下载了新模型并按了 R，但面板里看不到。** 在 ComfyUI 中再按一次 R：刷新节点定义时，面板的列表、模型选择器和 LoRA 图库会重新读取文件夹。LoRA 堆栈控件需要 Neural Dreamer Nodes 1.4.0 或更新版本。
 
-**模式中 ComfyUI 的快捷键不起作用。** 这是有意为之。请在 ComfyUI 设置 *ComfyUI ND UI Builder → ND UI mode* 中放行相应命令。
+**模式中 ComfyUI 的快捷键不起作用。** 这是有意为之。请在 ComfyUI 设置 *ND UI Builder → ND UI mode* 中放行相应命令。
 
 **在配置较低的电脑上页面卡顿。** 选择没有模糊的主题（午夜、工作室、ComfyUI），或关闭*使用模糊*。
 

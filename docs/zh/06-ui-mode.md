@@ -20,7 +20,7 @@ ND UI 模式用你的面板代替节点图。点击 Run 旁的 **ND UI** 按钮�
 
 ## 快捷键
 
-模式开启时，ComfyUI 的快捷键会暂停，避免在提示词中输入时误触发命令。在 ComfyUI 设置（**ComfyUI ND UI Builder → ND UI mode**）中可以放行个别命令：点击 **Add ComfyUI Hotkey**，选择需要继续生效的命令。浏览器快捷键（复制、粘贴、全选）始终可用。
+模式开启时，ComfyUI 的快捷键会暂停，避免在提示词中输入时误触发命令。在 ComfyUI 设置（**ND UI Builder → ND UI mode**）中可以放行个别命令：点击 **Add ComfyUI Hotkey**，选择需要继续生效的命令。浏览器快捷键（复制、粘贴、全选）始终可用。
 
 **Alt+Q** 打开工作流切换器（按住 Alt，按 Q 逐个切换，松开 Alt 完成切换）。模式开启且面板有项目文件时，**Ctrl+S** 保存项目。
 
