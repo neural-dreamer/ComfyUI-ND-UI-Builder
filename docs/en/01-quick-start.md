@@ -4,7 +4,7 @@ This page takes you from nothing to your first working panel in about five minut
 
 ## Install
 
-1. Put the folder `ComfyUI-NeuralDreamer-UI-Builder` into `ComfyUI/custom_nodes/` (or install it from the Comfy Registry / ComfyUI-Manager by the name **ComfyUI ND UI Builder**).
+1. Put the folder `ComfyUI-ND-UI-Builder` into `ComfyUI/custom_nodes/` (or install it from the Comfy Registry / ComfyUI-Manager by the name **ComfyUI ND UI Builder**).
 2. Restart ComfyUI and reload the browser page with Ctrl+F5.
 3. Two buttons appear in the action bar next to **Run**: **ND UI** and **Edit**.
 
