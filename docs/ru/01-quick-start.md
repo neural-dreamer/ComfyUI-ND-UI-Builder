@@ -4,7 +4,7 @@
 
 ## Установка
 
-1. Положите папку `ComfyUI-NeuralDreamer-UI-Builder` в `ComfyUI/custom_nodes/` (или установите через Comfy Registry / ComfyUI-Manager по имени **ComfyUI ND UI Builder**).
+1. Положите папку `ComfyUI-ND-UI-Builder` в `ComfyUI/custom_nodes/` (или установите через Comfy Registry / ComfyUI-Manager по имени **ComfyUI ND UI Builder**).
 2. Перезапустите ComfyUI и обновите страницу браузера через Ctrl+F5.
 3. В панели действий рядом с **Run** появятся две кнопки: **ND UI** и **Edit**.
 
