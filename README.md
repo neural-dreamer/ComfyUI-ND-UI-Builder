@@ -48,7 +48,7 @@ The tutorials have **English, Russian and Chinese** audio tracks, the promo has 
 - **Manually:** put the folder into `ComfyUI/custom_nodes/`:
   ```
   cd ComfyUI/custom_nodes
-  git clone https://github.com/neural-dreamer/ComfyUI-NeuralDreamer-UI-Builder
+  git clone https://github.com/neural-dreamer/ComfyUI-ND-UI-Builder
   ```
 
 Restart ComfyUI and reload the page (Ctrl+F5). Two buttons, **ND UI** and **Edit**, appear next to **Run**. No Python dependencies. Tried on the ComfyUI frontend 1.55 and 1.57.
