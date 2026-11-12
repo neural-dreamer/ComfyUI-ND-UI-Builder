@@ -48,7 +48,7 @@
 - **手动安装：** 把文件夹放入 `ComfyUI/custom_nodes/`：
   ```
   cd ComfyUI/custom_nodes
-  git clone https://github.com/neural-dreamer/ComfyUI-NeuralDreamer-UI-Builder
+  git clone https://github.com/neural-dreamer/ComfyUI-ND-UI-Builder
   ```
 
 重启 ComfyUI 并刷新页面（Ctrl+F5）。**Run** 旁边会出现 **ND UI** 和 **Edit** 两个按钮。没有 Python 依赖。已在 ComfyUI 前端 1.55 和 1.57 上测试。
