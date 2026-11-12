@@ -4,7 +4,7 @@
 
 ## 安装
 
-1. 将文件夹 `ComfyUI-NeuralDreamer-UI-Builder` 放入 `ComfyUI/custom_nodes/`（也可以在 Comfy Registry / ComfyUI-Manager 中按名称 **ComfyUI ND UI Builder** 安装）。
+1. 将文件夹 `ComfyUI-ND-UI-Builder` 放入 `ComfyUI/custom_nodes/`（也可以在 Comfy Registry / ComfyUI-Manager 中按名称 **ComfyUI ND UI Builder** 安装）。
 2. 重启 ComfyUI，并用 Ctrl+F5 刷新浏览器页面。
 3. 操作栏中 **Run** 旁边会出现两个按钮：**ND UI** 和 **Edit**。
 
